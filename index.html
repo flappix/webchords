@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8" />
+<title>ChordLooper</title>
+<script src="MIDI.js/inc/shim/Base64.js" type="text/javascript"></script>
+	<script src="MIDI.js/inc/shim/Base64binary.js" type="text/javascript"></script>
+	<script src="MIDI.js/inc/shim/WebAudioAPI.js" type="text/javascript"></script>
+	<!-- midi.js package -->
+	<script src="MIDI.js/js/midi/audioDetect.js" type="text/javascript"></script>
+	<script src="MIDI.js/js/midi/gm.js" type="text/javascript"></script>
+	<script src="MIDI.js/js/midi/loader.js" type="text/javascript"></script>
+	<script src="MIDI.js/js/midi/plugin.audiotag.js" type="text/javascript"></script>
+	<script src="MIDI.js/js/midi/plugin.webaudio.js" type="text/javascript"></script>
+	<script src="MIDI.js/js/midi/plugin.webmidi.js" type="text/javascript"></script>
+	<!-- utils -->
+	<script src="MIDI.js/js/util/dom_request_xhr.js" type="text/javascript"></script>
+	<script src="MIDI.js/js/util/dom_request_script.js" type="text/javascript"></script>
+	<script
+	  src="https://code.jquery.com/jquery-3.6.0.min.js"
+	  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+	  crossorigin="anonymous"></script>
+	  <link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Boogaloo&display=swap" rel="stylesheet">
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css" integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<style>
+		:root {
+		  --chord-bg: #DAF0FF;
+		  --chord-bg-play: #80AABD;
+		  --chord-border-dark: #9DD4DC;
+		  --chord-border-light: #48849E;
+		  --button-bg: #63AADA;
+		  --button-border: #465864;
+	  }
+		
+		* {
+		  margin: 0;
+		  padding: 0;
+		}
+		html, body
+		{
+			font-family: 'Boogaloo', cursive;
+			padding: 0px;
+			margin: 0xp;
+			border-collapse: collapse;
+			background-image: url(background.jpg);
+			
+		}
+		
+		#content
+		{
+			
+			margin: 0px;
+			background: rgba(0, 0, 0, 0.3);
+		}
+		
+		#examples, #help
+		{
+			font-size: 3em;
+			margin: 0px;
+			background: rgba(255, 255, 255, 0.5);
+			text-align: center;
+		}
+		
+		.example
+		{
+			padding: 10px;
+		}
+		
+		.example:hover
+		{
+			background: rgba(255, 255, 255, 0.8);
+			cursor: pointer;
+			padding: 10px;
+		}
+		
+		#chords, #chords:focus
+		{
+			font-size: 3em;
+			margin: 10px auto;
+			padding: 5px;
+			width: 90%;
+			border: none;
+			outline: none;
+			text-align: center;
+			background: rgba(255, 255, 255, 0.7);
+		}
+		#parsed
+		{
+			margin: 0px auto;
+			display: flex;
+			flex-direction: column;
+			font-size: 5em;
+			width: 70%;
+			padding: 20px;
+		}
+		
+		.bar
+		{
+			min-width: 500px;
+			white-space: nowrap;
+			margin: 10px;
+			display: flex;
+			box-sizing: border-box;
+
+		}
+		
+		
+		.chord
+		{
+			//margin: 10px;
+			margin: 0px;
+			display: inline-block;
+			background-color: var(--chord-bg);
+			border-radius: 10px;
+			//padding: 5px;
+			padding: 0px;
+			height: 100px;
+			border-bottom: 10px solid var(--chord-border-light);
+			border-right: 10px solid var(--chord-border-light);
+			border-top: 5px solid var(--chord-border-dark);
+			border-left: 5px solid var(--chord-border-dark);
+			text-shadow: 5px 5px var(--chord-border-dark);
+			text-align: center;
+		}
+		
+		.play
+		{
+			background-color: var(--chord-bg-play);
+			border-bottom: 5px solid var(--chord-border-light);
+			border-right: 5px solid var(--chord-border-light);
+			border-top: 10px solid var(--chord-border-dark);
+			border-left: 10px solid var(--chord-border-dark);
+			text-shadow: 5px 5px #48849E;
+		}
+		
+		input[type=range] {
+		  -webkit-appearance: none;
+		  width: 50%;
+		  height: 25px;
+		  background: #d3d3d3;
+		  outline: none;
+		  opacity: 0.7;
+		  -webkit-transition: .2s;
+		  transition: opacity .2s;
+		}
+
+		input[type=range]:hover {
+		  opacity: 1;
+		}
+
+		input[type=range]::-webkit-slider-thumb {
+		  -webkit-appearance: none;
+		  appearance: none;
+		  width: 25px;
+		  height: 25px;
+		  background: var(--button-bg);
+		  cursor: pointer;
+		}
+
+		input[type=slider]::-moz-range-thumb {
+		  width: 25px;
+		  height: 25px;
+		  background: #04AA6D;
+		  cursor: pointer;
+		}
+		
+		button {
+		  background-color: var(--button-bg);
+		  border: 4px solid var(--button-border);
+		  color: white;
+		  padding: 15px 32px;
+		  text-align: center;
+		  text-decoration: none;
+		  display: inline-block;
+		  font-size: 16px;
+		  margin: 4px 2px;
+		  cursor: pointer;
+		  font-weight: bold;
+		}
+		
+		.range_value
+		{
+			display: inline-block;
+			width: 2em;
+			padding: 5px;
+			font-size: 2em;
+			color: white;
+		}
+		
+		sup {
+			vertical-align: top;
+		}
+		
+		h1
+		{
+			font-size: 4em;
+			color: #80AABD;
+			background-color: rgba(0,0,0,0.7);
+		}
+		
+		.config
+		{
+			font-size: 2em; font-weight: bold;
+			color: white;
+		}
+
+.loading {
+	background: url('loading.gif');
+	border: none;
+	background-repeat: no-repeat;
+	object-fit: cover;
+}
+	</style>
+</head>
+
+<body>
+	<script type="text/javascript">
+		
+		let map = {
+			'c':	0,
+			'c#':	1, 'db':	1,
+			'd':	2,
+			'd#':	3, 'eb':	3,
+			'e':	4,
+			'e#':	5, 'f':		5,
+			'f#':	6, 'gb':	6,
+			'g':	7,
+			'g#':	8, 'ab':	8,
+			'a':	9,
+			'a#':	10, 'bb':	10,
+			'b':	11, 'cb':	11
+		   };
+		
+		let chord_patterns = [
+			 // pattern with forceParenthese = true have to come first
+			{name: 'flat five', postfix: '<sup>♭5</sup>', pattern: /^[a-g][#b]?\(b5\)(\/[a-g][#b]?)?$/i, notes: [0, 4, 6], forceParenthese: true},
+			
+			{name: 'power chord', postfix: '5', pattern: /^[a-g][#b]?5(\/[a-g][#b]?)?$/i, notes: [0, 7]},
+			{name: 'major', postfix: '', pattern: /^[a-g][#b]?(maj)?(\/[a-g][#b]?)?$/i, notes: [0, 4, 7]},
+			{name: 'major6', postfix: '<sup>6</sup>', pattern: /^[a-g][#b]?6(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 9]},
+			{name: 'major6 flat 5', postfix: '<sup>6♭5</sup>', pattern: /^[a-g][#b]?6b5(\/[a-g][#b]?)?$/i, notes: [0, 4, 6, 9]},
+			{name: 'major7', postfix: '<sup>7</sup>', pattern: /^[a-g][#b]?7(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 10]},
+			{name: 'major7 flat 5', postfix: '<sup>7♭5</sup>', pattern: /^[a-g][#b]?7b5(\/[a-g][#b]?)?$/i, notes: [0, 4, 6, 10]},
+			{name: 'major9', postfix: '<sup>9</sup>', pattern: /^[a-g][#b]?9(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 10, 14]},
+			{name: 'major9 flat 5', postfix: '<sup>9♭5</sup>', pattern: /^[a-g][#b]?9b5(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 10, 14]},
+			{name: 'minor', postfix: 'm', pattern: /^[a-g][#b]?(m|min)(\/[a-g][#b]?)?$/i, notes: [0, 3, 7]},
+			{name: 'minor7', postfix: 'm<sup>7</sup>', pattern: /^[a-g][#b]?(m|min)7(\/[a-g][#b]?)?$/i, notes: [0, 3, 7, 10]},
+			{name: 'minor6', postfix: 'm<sup>6</sup>', pattern: /^[a-g][#b]?(m|min)6(\/[a-g][#b]?)?$/i, notes: [0, 3, 7, 9]},
+			{name: 'minor7flatfive', postfix: 'm7<sup>♭5</sup>',pattern: /^[a-g][#b]?(m|min)7?b5?(\/[a-g][#b]?)?$/i, notes: [0, 3, 6, 10]},
+			{name: 'maj7', postfix: 'maj7', pattern: /^[a-g][#b]?maj7(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 11]},
+			{name: 'dim', postfix: 'dim', pattern: /^[a-g][#b]?dim(\/[a-g][#b]?)?$/i, notes: [0, 3, 6]},
+			{name: 'dim7', postfix: 'dim<sup>7</sup>', pattern: /^[a-g][#b]?dim7(\/[a-g][#b]?)?$/i, notes: [0, 3, 6, 9]},
+			{name: 'minor add 9', postfix: 'm<sup>add9</sup>', pattern: /^[a-g][#b]?(m|min)add9(\/[a-g][#b]?)?$/i, notes: [0, 3, 7, 14]},
+			{name: 'minor9', postfix: 'm<sup>9</sup>', pattern: /^[a-g][#b]?(m|min)9(\/[a-g][#b]?)?$/i, notes: [0, 3, 7, 10, 14]},
+			{name: 'major add 9', postfix: '<sup>add9</sup>', pattern: /^[a-g][#b]?add9(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 9]},
+			{name: 'major add 9 flat 5', postfix: '<sup>add9♭5</sup>', pattern: /^[a-g][#b]?add9b5(\/[a-g][#b]?)?$/i, notes: [0, 4, 6, 9]},
+			{name: 'augumented', postfix: 'aug', pattern: /^[a-g][#b]?aug(\/[a-g][#b]?)?$/i, notes: [0, 4, 8]},
+			{name: 'augumented 7', postfix: 'aug7', pattern: /^[a-g][#b]?aug7(\/[a-g][#b]?)?$/i, notes: [0, 4, 8, 10]},
+			{name: 'augumented maj7', postfix: 'aug<sup>(maj7)</sup>', pattern: /^[a-g][#b]?augmaj7(\/[a-g][#b]?)?$/i, notes: [0, 4, 8, 11]},
+			{name: 'sus2', postfix: 'sus2', pattern: /^[a-g][#b]?sus2(\/[a-g][#b]?)?$/i, notes: [0, 2, 7]},
+			{name: 'sus4', postfix: 'sus4', pattern: /^[a-g][#b]?sus4(\/[a-g][#b]?)?$/i, notes: [0, 5, 7]},
+			{name: 'sus2flat5', postfix: 'sus2', pattern: /^[a-g][#b]?sus2b5(\/[a-g][#b]?)?$/i, notes: [0, 2, 6]},
+			{name: 'sus4flat5', postfix: 'sus4', pattern: /^[a-g][#b]?sus4b5(\/[a-g][#b]?)?$/i, notes: [0, 5, 6]},
+			{name: 'seven flat five', postfix: '<sup>7♭5</sup>', pattern: /^[a-g][#b]?7b5(\/[a-g][#b]?)?$/i, notes: [0, 4, 6, 10]},
+			
+			// template chords
+			{name: 'add n', postfixStart: '<sup>add', postfixEnd: '</sup>', pattern: /^[a-g][#b]?add([b#]?[1-9]{1,2})(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 'n'], template: true},
+		];
+		
+		let scale_map = {
+			'1':	0,
+			'b2':	1,
+			'2':	2,
+			'#2':	3,
+			'b3':	3,
+			'3':	4,
+			'#3':	5,
+			'b4':	4,
+			'4':	5,
+			'#4':	6,
+			'b5':	6,
+			'5':	7,
+			'#5':	8,
+			'b6':	8,
+			'6':	9,
+			'#6':	10,
+			'b7':	9,
+			'7':	10,
+			'#7':	11,
+			'8':	12,
+			'b9':	13,
+			'9':	14,
+			'#9':	15,
+			'b10':	15,
+			'10':	16,
+			'#10':	17,
+			'b11':	16,
+			'11':	17,
+			'#11':	18,
+			'b12':	18,
+			'12':	19,
+			'#12':	20,
+			'b13':	21,
+		}
+			
+			 
+		
+		let loaded = false;
+		let play = false;
+		let play_metronome = false;
+		let sequence;
+		
+		let volume= 127;
+		let velocity= 127;
+		let channel = {'piano': 0, 'drum': 1};
+		
+		let loop_label_play = '<i class="fas fa-play"></i> Loop';
+		let loop_label_stop = '<i class="fas fa-stop"></i> Stop';
+		
+		function bar_length()
+		{
+			return ( 60 / Number ( $('#bpm').val() ) ) * 4 ;
+		}
+		
+		function loopSequence (seq, stop=false)
+		{	
+			function playChord (bar_c, chord_c, duration)
+			{				
+				if (play == true)
+				{
+					if (seq[bar_c][chord_c].notes != null)
+					{
+						MIDI.chordOn (channel['piano'], seq[bar_c][chord_c].notes, velocity, 0);
+					}
+					
+					$(`#chord_${bar_c}_${chord_c}`).addClass ('play');
+					
+					let next_call;
+					if (bar_c < seq.length && chord_c < seq[bar_c].length - 1)
+					{
+						next_call = function() { playChord (bar_c, chord_c + 1); }
+					}
+					else if (bar_c < seq.length - 1)
+					{
+						next_call = function () { playChord (bar_c + 1, 0); }
+					}
+					else
+					{
+						next_call = function () { playChord (0, 0); }
+					}
+					
+					setTimeout ( function()
+					{
+						$(`#chord_${bar_c}_${chord_c}`).removeClass ('play');
+						next_call();
+					}, seq[bar_c][chord_c].duration * 1000 );
+				}
+				else
+				{
+					play = false; // confirm stopping
+				}
+			}
+			
+			playChord (0, 0, seq[0][0].duration);
+		}
+		
+		function metronome()
+		{
+			function playBeat()
+			{				
+				if (play_metronome == true)
+				{
+					MIDI.noteOn (channel['drum'], 50, 127, 0)
+					setTimeout (playBeat, (bar_length() / 4) * 1000 );
+				}
+				else if (play_metronome == 'stop') //confirm stopping
+				{
+					play_metronome = false;
+				}
+			}
+			
+			playBeat();
+		}
+		
+		function formatChord (chord)
+		{
+			return chord[0].toUpperCase() + ( chord.length > 1 ? ( chord[1] == '#' ? '#' : (chord[1] == 'b' ? '♭' : '') ) : '' )
+		}
+		
+		function parseInput()
+		{
+			if (loaded)
+			{
+				let query = $('#chords').val().replace(/\s\s+/g, ' ').replace (/\s?[\|,;]\s?/g, '|').replace (/\([\|,;]\)/g, '');
+				let query_bars = query.split (/[|,;]+/);
+				
+				let sequence = [];
+				
+				for (let b of query_bars)
+				{
+					let query_chords = b.split (' ');
+					let bar = [];
+					
+					for (let c of query_chords)
+					{
+						if (c != '')
+						{
+							let octave = 4;
+							
+							let notes = [];
+							let str = '';
+							
+							if (c == '%') // repeat last chord
+							{
+
+								for (offset = 1; offset <= bar.length && bar[bar.length - offset] == null; offset++) {}
+								if (bar[bar.length - offset] != null)
+								{
+									bar[bar.length - offset].duration *= 2;
+								}
+							}
+							else if (c == '_') // pause
+							{
+								bar.push ({
+									'duration': bar_length() / query_chords.length,
+									'symbol': ''
+								});
+							}
+							else
+							{
+								found = false;
+								for (let p of chord_patterns)
+								{
+									let m;
+									if ( Array.isArray (p.pattern) )
+									{
+										for (let pp of p.pattern)
+										{
+											m = ( pp.forceParenthese ? c : c.replace (/\(|\)/g, '') ).toLowerCase().match (pp);
+											if (m) break;
+										}
+									}
+									else
+									{
+										m = ( p.forceParenthese ? c : c.replace (/\(|\)/g, '') ).toLowerCase().match (p.pattern);
+									}
+									
+									if (m)
+									{
+										let root = map[c[0].toLowerCase()] + octave*12;
+										if (c.length >= 2)
+										{
+											if (c[1] == '#') root++;
+											if (c[1] == 'b') root--;
+										}
+										
+										let chord;
+										
+										if (p.template == true)
+										{
+											console.log (m[1]);
+											chord = {
+												'notes': p.notes.map ( (x) => { return x == 'n' ? scale_map[m[1]] + root : x + root } ),
+												'duration': bar_length() / query_chords.length,
+												'symbol': c[0].toUpperCase() + ( c.length > 1 ? ( c[1] == '#' ? '#' : (c[1] == 'b' ? '♭' : '') ) : '' ) + p.postfixStart + m[1].replace (/b/g, '♭') + p.postfixEnd
+											}
+										}
+										else
+										{
+											chord = {
+												'notes': p.notes.map ( (x) => { return x + root } ),
+												'duration': bar_length() / query_chords.length,
+												'symbol': c[0].toUpperCase() + ( c.length > 1 ? ( c[1] == '#' ? '#' : (c[1] == 'b' ? '♭' : '') ) : '' ) + p.postfix
+											}
+										}
+										
+										// slash chords
+										let slash_group = m.length - 1;
+										if (m.length >= 2 && m[slash_group] != null && m[slash_group][0] == '/')
+										{
+											chord.notes.push ( map[m[slash_group].slice(1)] + (octave -1 ) * 12 );
+											if (m[slash_group].length > 2 && m[slash_group][m[slash_group].length - 1] == 'b')
+											{
+												chord.symbol += m[slash_group].toUpperCase().substring (0, m[slash_group].length - 1) + '♭';
+											}
+											else
+											{
+												chord.symbol += m[slash_group].toUpperCase();
+											}
+											
+										}
+										
+										bar.push (chord);
+										
+										found = true;
+										break;
+									}
+								}
+								
+								if (!found)
+								{
+									bar.push ({
+											'notes': [],
+											'duration': 0,
+											'symbol': `<span style="color: red;">${c}</span>`
+										});
+								}
+							}
+						}
+					}
+					
+					if (bar.length > 0)
+					{
+						sequence.push (bar);
+					}
+				}
+				
+				return sequence;
+			}
+		}
+		
+		function changeVolume (c, v)
+		{
+			MIDI.setVolume ( c, Number (v) );
+		}
+		
+		function changeBPM()
+		{
+			let restart = play;
+			
+			if (play == true)
+			{
+				$('#loop').attr ('disabled', 'disabled');
+				$('#loop').html ('... loading ...');
+				
+				stop();
+			}
+			
+			for (let bar of sequence)
+			{
+				for (let chord of bar)
+				{
+					chord.duration = bar_length() / bar.length;
+				}
+			}
+			
+			function startMetronome()
+			{
+				if (play == false && play_metronome == false)
+				{
+					$('#loop').removeAttr ('disabled');
+					$('#loop').html (loop_label_stop);
+					start();
+				}
+				else
+				{
+					setTimeout (startMetronome, 500);
+				}
+			}
+			
+			if (restart == true)
+			{
+				startMetronome();
+			}
+		}
+			
+		
+		function render()
+		{
+			$('#parsed').empty();
+			for ( const [b, bar] of sequence.entries() )
+			{
+				let bar_div = $('<div class="bar"></div>');
+				for ( const [c, chord] of bar.entries() )
+				{
+					if (chord != null )
+						bar_div.append ( $(`<div class="chord" id="chord_${b}_${c}" style="width: ${ (chord.duration / bar_length() ) * 1500 - 30}px;">${chord != null ? chord.symbol : '%'}</div>`) );
+				}
+				
+				$('#parsed').append (bar_div);
+			}
+		}
+		
+		function loopUI()
+		{	
+			play = !play;
+			$('#loop').html (play ? loop_label_stop : loop_label_play);
+			
+			if (play)
+			{
+				start();
+			}
+			else
+			{	
+				play_metronome = 'stop';
+				//stopAllNotes();
+			}	
+		}
+		
+		function start()
+		{
+			play_metronome = true;
+			metronome();
+			play = true;
+			loopSequence (sequence);
+		}
+		
+		function stop()
+		{
+			if (play == true)
+			{
+				play = 'stop';
+			}
+			
+			if (play_metronome == true)
+			{
+				play_metronome = 'stop';
+			}
+		}
+		
+		function showExamples()
+		{
+			$('#examples').toggle();
+			$('#help').hide();
+		}
+		
+		function loadProgression (prog)
+		{
+			$('#chords').val (prog);
+			stop();
+			sequence = parseInput();
+			render();
+			$('#examples').hide();
+			$('#loop').html (loop_label_play);
+		}
+		
+		$(document).ready ( () => {
+			MIDI.loadPlugin({
+				soundfontUrl: "MIDI.js/examples/soundfont/",
+				instruments: ["acoustic_grand_piano", 'synth_drum'],
+				//instrument: 'synth_drum',
+				onprogress: function(state, progress) {
+					console.log(state, progress);
+				},
+				onsuccess: function() {
+					MIDI.programChange (channel['drum'], MIDI.GM.byName["synth_drum"].number);
+					MIDI.setVolume (0, volume);
+					MIDI.setVolume (1, volume);
+					loaded = true;
+					sequence = parseInput();
+					render();
+					$('#content').show();
+				}
+			});
+			
+			$('#chords').keyup ( () => {
+				$('#loop').html (loop_label_play);
+				stop();
+				sequence = parseInput();
+				render();
+				
+			});
+			
+			$('body').keyup (function(e) {
+			   if ( $(':focus').length == 0 && e.keyCode == 32) {
+				   loopUI();
+			   }
+			});
+			
+			
+		});
+		
+		function showHelp()
+		{
+			$('#help').toggle();
+			$('#examples').hide();
+		}
+			
+						
+	</script>
+	<div id="content" style="text-align: center; display: none;">
+		<h1><i class="fas fa-guitar"></i> ChordLooper</h1>
+		<input type="text" id="chords" value="Am7 Dmadd9 | G7 Cmaj7 | Fmaj7/C Bm7b5 | E7/G#" /><br />
+		<span class="config"><i title="volume" class="fas fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume (channel['piano'], $(this).val() );" oninput="$('#vol_value').html (this.value)"><br />
+		<span class="config""><i title="BPM" class="fas fa-heartbeat"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"><br />
+		<button onclick="loopUI()" type="button" id="loop"><i class="fas fa-play"></i> Loop</button>
+		<button onclick="showExamples()" type="button" id="showExample"><i class="fas fa-flask"></i> Examples</button>
+		<button onclick="showHelp();" type="button" id="showHelp"><i class="fas fa-question-circle"></i> Help</button>
+	</div>
+	<div id="examples" style="display: none;">
+		<div class="example" onclick="loadProgression ($(this).html());">Dm/F | Bbmaj7 | C | A7</div>
+		<div class="example" onclick="loadProgression ($(this).html());">Cmadd9 % Ab6 Ebmaj7 | Ebaug Ddim7 _ G7/Ab | _ Ab7 % G7</div>
+		<div class="example" onclick="loadProgression ($(this).html());">Em Esus2 Em Esus4, Cadd#4 Amadd9, F7 E7, B7/C % F#dim D#dim</div>
+	</div>
+	
+	<div id="help" style="display: none;">
+		Enter chord symbols in the text field.<br />
+		Separate chords with a space.<br />
+		Separate bars with a | , or ;<br />
+		Use % to repeat the last chord<br />
+		Use _ to play pause<br />
+		Each chord is played equally long in each bar. E.g. putting 4 chords in one bar result in one chord every beat.
+	</div>
+	
+	<div id="parsed"></div>
+
+</body>
+
+</html>
