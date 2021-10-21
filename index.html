@@ -354,6 +354,15 @@
 			{				
 				if (play == true)
 				{
+					if (beat && play_metronome) 
+					{
+						MIDI.setVolume (channel['drum'], volume['drum']);
+						MIDI.noteOn (channel['drum'], drum_sound, 127, 0);
+						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) );
+						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) * 2);
+						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) * 3);
+					}
+						
 					if (seq[bar_c][chord_c].notes != null)
 					{
 						
@@ -365,14 +374,6 @@
 						MIDI.setVolume (channel['chord'], volume['chord']);
 						MIDI.chordOn (channel['chord'], seq[bar_c][chord_c].notes, velocity, 0);
 						last_chord = seq[bar_c][chord_c].notes;
-						if (beat && play_metronome) 
-						{
-							MIDI.setVolume (channel['drum'], volume['drum']);
-							MIDI.noteOn (channel['drum'], drum_sound, 127, 0);
-							MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) );
-							MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) * 2);
-							MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) * 3);
-						}
 					}
 					
 					$(`#chord_${bar_c}_${chord_c}`).addClass ('play');
