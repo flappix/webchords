@@ -461,6 +461,11 @@
 								{
 									bar[bar.length - offset].duration *= 2;
 								}
+								
+								bar.push ({
+									'duration': 0,
+									'symbol': ''
+								});
 							}
 							else if (c == '_') // pause
 							{
@@ -607,6 +612,65 @@
 			if (restart == true)
 			{
 				startMetronome();
+			}
+		}
+		
+		function transpose (offset)
+		{
+			let scale = ['A', ['A#', 'B♭'], 'B', 'C', ['C#', 'D♭'], 'D', ['D#', 'E♭'], 'E', 'F', ['F#', 'G♭'], 'G', ['G#', 'A♭']];
+			
+			let new_roots = [];
+			
+			for (let bar of sequence)
+			{
+				for (let chord of bar)
+				{
+					for (let n in chord.notes)
+					{
+						chord.notes[n] += offset;
+					}
+					
+					let root = chord.symbol.substring (0, chord.symbol[1] == '#' || chord.symbol[1] == '♭' ? 2 : 1);
+					for ( const [i, s] of scale.entries() )
+					{
+						if ( ( !Array.isArray (s) && s == root ) || ( Array.isArray (s) && s.includes (root) ) )
+						{
+							new_roots.push (scale[(i + offset) % scale.length]);
+						}
+					}
+					
+				}
+			}
+			
+			let sharps = 0;
+			let flats = 0;
+			
+			for (const [i, r] of new_roots.entries())
+			{
+				if ( Array.isArray (r) )
+				{
+					console.log (r);
+					console.log (r[0][0]);
+					console.log (r[1][0]);
+					if ( new_roots.includes (r[0][0]) )
+					{
+						//new_roots[i] = r[1];
+						flats++;
+					}
+					else if ( new_roots.includes (r[1][0]) )
+					{
+						//new_roots[i] = r[0];
+						sharps++;
+					}
+				}
+			}
+			
+			for (const [i, r] of new_roots.entries())
+			{
+				if ( Array.isArray (r) )
+				{
+					new_roots[i] = r[flats > sharps ? 1 : 0];
+				}
 			}
 		}
 			
@@ -756,7 +820,10 @@
 				instruments: ['acoustic_grand_piano', 'acoustic_guitar_nylon', 'acoustic_guitar_steel', 'electric_guitar_clean', 'steel_drums'],
 				//instrument: 'acoustic_guitar_nylon',
 				onprogress: function(state, progress) {
-					console.log(state, progress);
+					if (state == 'load')
+					{
+						$('#progress').html ( Math.round (progress * 100) + '%' );
+					}
 				},
 				onsuccess: function() {
 					MIDI.programChange (channel['chord'], MIDI.GM.byName["acoustic_grand_piano"].number);
@@ -793,10 +860,12 @@
 			$('#help').toggle();
 			$('#examples').hide();
 		}
+		
+		
 			
 						
 	</script>
-	<div id="loading"><h1>... Loading ...</h1></div>
+	<div id="loading"><h1>... Loading ...<span id="progress">0%</span></h1></div>
 	<div id="content" style="display: none; text-align: center;">
 		<h1><i class="fas fa-guitar"></i> ChordLooper</h1>
 		<input type="text" id="chords" value="Am7 Dmadd9 | G7 Cmaj7 | Fmaj7/C Bm7b5 | E7/G#" /><br />
