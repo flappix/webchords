@@ -364,6 +364,12 @@
 			return ( 60 / Number ( $('#bpm').val() ) ) * 4 ;
 		}
 		
+		function linearTrans (x1, x2, a, b, c)
+		{
+			return x1 + ((x2 - x1)/(b - a)) * (c - a);
+		}
+
+		
 		function loopSequence (seq)
 		{	
 			function playChord (bar_c, chord_c, beat=false)
@@ -388,7 +394,8 @@
 						
 						for (let n of seq[bar_c][chord_c].notes)
 						{
-							let vel =  (127 - humanize) + Math.floor ( Math.random() * humanize );
+							let vel_off = linearTrans (100, 127, 0, 127, humanize);
+							let vel =  (127 - vel_off) + Math.floor ( Math.random() * vel_off );
 							let off =  Math.random() * (humanize / 100);
 							MIDI.noteOn (channel['chord'], n, vel, off);
 						}
@@ -399,7 +406,6 @@
 					
 					if (beat && play_metronome) 
 					{
-						console.log (bar_length());
 						MIDI.setVolume (channel['drum'], volume['drum']);
 						MIDI.noteOn (channel['drum'], drum_sound, 127, 0);
 						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) );
