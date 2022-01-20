@@ -243,6 +243,7 @@
 		.transposeDisplay
 		{
 			color: var(--chord-bg-play);
+			width: 50px;
 		};
 	</style>
 </head>
@@ -690,7 +691,6 @@
 			{
 				let docs = localStorage.getItem ('docs');
 				docs = docs.replace (str + '+++', '');
-				console.log (docs);
 				localStorage.setItem ('docs', docs);
 				updateloadlist();
 			}
@@ -731,9 +731,6 @@
 			{
 				if ( Array.isArray (r) )
 				{
-					console.log (r);
-					console.log (r[0][0]);
-					console.log (r[1][0]);
 					if ( new_roots.includes (r[0][0]) )
 					{
 						//new_roots[i] = r[1];
@@ -866,7 +863,6 @@
 		{
 			$('.menuItem').hide();
 			$('#' + id).show();
-			console.log ($('#' + id));
 			
 		}
 		
