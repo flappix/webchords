@@ -357,6 +357,8 @@
 		
 		let last_chord;
 		
+		let humanize = 20;
+		
 		function bar_length()
 		{
 			return ( 60 / Number ( $('#bpm').val() ) ) * 4 ;
@@ -368,26 +370,41 @@
 			{				
 				if (play == true)
 				{
-					if (beat && play_metronome) 
-					{
-						MIDI.setVolume (channel['drum'], volume['drum']);
-						MIDI.noteOn (channel['drum'], drum_sound, 127, 0);
-						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) );
-						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) * 2);
-						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) * 3);
-					}
+					
 						
 					if (seq[bar_c][chord_c].notes != null)
 					{
 						
 						if (last_chord)
 						{
-							MIDI.chordOff (channel['chord'], last_chord, velocity, 0);
+							//MIDI.chordOff (channel['chord'], last_chord, velocity, 0);
+							for (let n of last_chord)
+							{
+								MIDI.noteOff (channel['chord'], n, velocity, 0);
+							}
 						}
 						
 						MIDI.setVolume (channel['chord'], volume['chord']);
-						MIDI.chordOn (channel['chord'], seq[bar_c][chord_c].notes, velocity, 0);
+						
+						for (let n of seq[bar_c][chord_c].notes)
+						{
+							let vel =  (127 - humanize) + Math.floor ( Math.random() * humanize );
+							let off =  Math.random() * (humanize / 100);
+							MIDI.noteOn (channel['chord'], n, vel, off);
+						}
+						//MIDI.chordOn (channel['chord'], seq[bar_c][chord_c].notes, velocity, 0);
+						
 						last_chord = seq[bar_c][chord_c].notes;
+					}
+					
+					if (beat && play_metronome) 
+					{
+						console.log (bar_length());
+						MIDI.setVolume (channel['drum'], volume['drum']);
+						MIDI.noteOn (channel['drum'], drum_sound, 127, 0);
+						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) );
+						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) * 2);
+						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) * 3);
 					}
 					
 					$(`#chord_${bar_c}_${chord_c}`).addClass ('play');
@@ -627,6 +644,11 @@
 			{
 				startMetronome();
 			}
+		}
+		
+		function changeHumanize()
+		{
+			humanize = $('#humanize').val();
 		}
 		
 		function save()
@@ -965,7 +987,8 @@
 		<br />
 		<span class="config"><i title="volume" class="fas fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"><br />
 		<span class="config"><i title="BPM" class="fas fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"><br />
-		<span class="config"><i title="Metronome volume" class="fas fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)">
+		<span class="config"><i title="Metronome volume" class="fas fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"><br />
+		<span class="config"><i title="Humanize" class="fas fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">20</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)">
 		<div style="display: flex; justify-content: center; color: white;">
 			<div>Select chord sound <br /><select id="selectSound" onchange="selectSound()">
 				<option value="acoustic_grand_piano">Piano</option>
