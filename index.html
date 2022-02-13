@@ -830,6 +830,8 @@
 		
 		function loopUI()
 		{	
+			$('.menuItem').hide();
+			
 			$('#loop').html ( $('#loop').html() == loop_label_play ? loop_label_stop : loop_label_play);
 						
 			if (!play)
