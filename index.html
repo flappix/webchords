@@ -182,6 +182,7 @@
 		
 		button[disabled] {
 		  background-color: var(--button-disabled);
+		  cursor: wait;
 		}
 		
 		select, option
@@ -469,8 +470,8 @@
 		
 		function parseInput()
 		{
-			if (loaded)
-			{
+			//if (loaded)
+			//{
 				let query = $('#chords').val().replace(/\s\s+/g, ' ').replace (/\s?[\|,;]\s?/g, '|').replace (/\([\|,;]\)/g, '').trim();
 				let query_bars = query.split (/[|,;]+/);
 				
@@ -603,7 +604,7 @@
 				}
 				
 				return sequence;
-			}
+			//}
 		}
 		
 		function changeVolume (c, v)
@@ -926,32 +927,51 @@
 		function selectSound ()
 		{
 			MIDI.programChange (channel['chord'], MIDI.GM.byName[ $('#selectSound').val() ].number);
+			let o = $('#selectSound :selected');
+			if ( o.attr ('data-humanize') )
+			{
+				$('#humanize').val ( o.attr ('data-humanize') );
+				$('#humanize_value').html ( o.attr ('data-humanize') );
+				changeHumanize();
+			}
+			
+			if ( o.attr ('data-volume') )
+			{
+				$('#vol').val ( o.attr ('data-volume') );
+				$('#vol_value').html ( o.attr ('data-volume') );
+				changeVolume();
+			}
+			
 		}
 		
 		$(document).ready ( () => {
+			sequence = parseInput();
+			render();
+					
 			MIDI.loadPlugin({
 				targetFormat: 'mp3',
 				//soundfontUrl: "MIDI.js/examples/soundfont/",
 				soundfontUrl: "FluidR3_GM/",
 				
-				instruments: ['acoustic_grand_piano', 'acoustic_guitar_nylon', 'acoustic_guitar_steel', 'electric_guitar_clean', 'steel_drums'],
+				instruments: ['acoustic_grand_piano', 'acoustic_guitar_nylon', 'acoustic_guitar_steel', 'electric_guitar_clean', 'steel_drums', 'pad_2_warm'],
 				//instrument: 'acoustic_guitar_nylon',
-				onprogress: function(state, progress) {
+				/*onprogress: function(state, progress) {
 					if (state == 'load')
 					{
 						$('#progress').html ( Math.round (progress * 100) + '%' );
 					}
-				},
+				},*/
 				onsuccess: function() {
 					MIDI.programChange (channel['chord'], MIDI.GM.byName["acoustic_grand_piano"].number);
 					MIDI.programChange (channel['drum'], MIDI.GM.byName["steel_drums"].number);
-					MIDI.setVolume (0, volume);
 					MIDI.setVolume (1, volume);
 					loaded = true;
-					sequence = parseInput();
-					render();
-					$('#loading').hide();
-					$('#content').show();
+					//$('#loading').hide();
+					//$('#content').show();
+					
+					 $('#loop').html ('<i class="fas fa-play"></i> Loop');
+					 $('#loop').removeAttr ('disabled'); 
+					 
 				}
 			});
 			
@@ -984,8 +1004,8 @@
 			
 						
 	</script>
-	<div id="loading"><h1>... Loading ...<span id="progress">0%</span></h1></div>
-	<div id="content" style="display: none; text-align: center;">
+	<!--<div id="loading"><h1>... Loading ...<span id="progress">0%</span></h1></div>-->
+	<div id="content" style="text-align: center;">
 		<h1><i class="fas fa-guitar"></i> ChordLooper</h1>
 		<span id="transposeDownDisplay" class="transposeDisplay"></span>  <button class="transpose" title="transpose down half step" onclick="transpose (-1)">&#x2B07;</button>  <input type="text" id="chords" value="Am7 Dmadd9 | G7 Cmaj7 | Fmaj7/C Bm7b5 | E7/G#" /> <button title="transpose up half step" class="transpose" onclick="transpose (1)">&#x2B06;</button> <span class="transposeDisplay" id="transposeUpDisplay"></span> <br />
 		
@@ -1001,6 +1021,7 @@
 				<option value="acoustic_guitar_nylon">Classical guitar</option>
 				<option value="acoustic_guitar_steel">Western guitar</option>
 				<option value="electric_guitar_clean">Electric guitar clean</option>
+				<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
 			</select></div>
 			<div>Select metronome sound <br /><select id="selectDrum" onchange="selectDrum()">
 				<option value="42">HiHat</option>
@@ -1009,7 +1030,7 @@
 			</select></div>
 		</div>
 		
-		<button onclick="loopUI()" type="button" id="loop" class="menu"><i class="fas fa-play"></i> Loop</button>
+		<button onclick="loopUI()" type="button" id="loop" class="menu" disabled><i class="fas fa-play"></i> Loading soundfonts... <img src="loading.svg" /></button>
 		<button onclick="show ('examples')" type="button" id="showExample" class="menu"><i class="fas fa-flask"></i> Examples</button>
 		<button onclick="save()" id="save"><i class="fas fa-save"></i> Save</button>
 		<button onclick="show ('load')" type="button" id="showLoad" class="menu" disabled><i class="fas fa-folder-open"></i> Load</button>
