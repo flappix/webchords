@@ -221,9 +221,16 @@
 		{
 			font-size: 4em;
 			color: #80AABD;
-			background-color: rgba(0,0,0,0.7);
-			text-align: center; 
+			text-align: center;
+			margin: 0px auto;
 		}
+		
+		#header
+		{
+			background-color: rgba(0,0,0,0.7);
+			display: flex;
+		}
+			
 		
 		.config
 		{
@@ -830,13 +837,12 @@
 		
 		function loopUI()
 		{	
-			$('.menuItem').hide();
-			
 			$('#loop').html ( $('#loop').html() == loop_label_play ? loop_label_stop : loop_label_play);
 						
 			if (!play)
 			{
 				start();
+				$('.menuItem').hide();
 			}
 			else
 			{	
@@ -1036,7 +1042,13 @@
 	<!--<div id="loading"><h1>... Loading ...<span id="progress">0%</span></h1></div>-->
 	<div style="position: -webkit-sticky;position: sticky; top: 0;">
 		<div id="content" style="text-align: center;">
-			<h1><i class="fas fa-guitar"></i> ChordLooper</h1>
+			<div id="header">
+				<h1><i class="fas fa-guitar"></i> ChordLooper</h1>
+				<a href="https://github.com/flappix/chordlooper" style="margin: 10px;">
+					<img src="GitHub-Mark-Light-64px.png" />
+				</a>
+			</div>
+			
 			<span id="transposeDownDisplay" class="transposeDisplay"></span>  <button class="transpose" title="transpose down half step" onclick="transpose (-1)">&#x2B07;</button>  <input type="text" id="chords" value="Am7 Dmadd9 | G7 Cmaj7 | Fmaj7/C Bm7b5 | E7/G#" /> <button title="transpose up half step" class="transpose" onclick="transpose (1)">&#x2B06;</button> <span class="transposeDisplay" id="transposeUpDisplay"></span> <br />
 			
 			
