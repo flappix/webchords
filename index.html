@@ -302,12 +302,15 @@
 			{name: 'major7', postfix: '<sup>7</sup>', pattern: /^[a-g][#b]?7(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 10]},
 			{name: 'major7 flat 5', postfix: '<sup>7♭5</sup>', pattern: /^[a-g][#b]?7b5(\/[a-g][#b]?)?$/i, notes: [0, 4, 6, 10]},
 			{name: 'major9', postfix: '<sup>9</sup>', pattern: /^[a-g][#b]?9(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 10, 14]},
+			{name: 'major13', postfix: '<sup>13</sup>', pattern: /^[a-g][#b]?13(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 10, 22]},
 			{name: 'major9 flat 5', postfix: '<sup>9♭5</sup>', pattern: /^[a-g][#b]?9b5(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 10, 14]},
 			{name: 'minor', postfix: 'm', pattern: /^[a-g][#b]?(m|min)(\/[a-g][#b]?)?$/i, notes: [0, 3, 7]},
 			{name: 'minor7', postfix: 'm<sup>7</sup>', pattern: /^[a-g][#b]?(m|min)7(\/[a-g][#b]?)?$/i, notes: [0, 3, 7, 10]},
 			{name: 'minor6', postfix: 'm<sup>6</sup>', pattern: /^[a-g][#b]?(m|min)6(\/[a-g][#b]?)?$/i, notes: [0, 3, 7, 9]},
 			{name: 'minor7flatfive', postfix: 'm7<sup>♭5</sup>',pattern: /^[a-g][#b]?(m|min)7?b5?(\/[a-g][#b]?)?$/i, notes: [0, 3, 6, 10]},
 			{name: 'maj7', postfix: 'maj7', pattern: /^[a-g][#b]?maj7(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 11]},
+			{name: 'maj9', postfix: 'maj9', pattern: /^[a-g][#b]?maj9(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 11, 14]},
+			{name: 'maj13', postfix: 'maj13', pattern: /^[a-g][#b]?maj13(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 11, 22]},
 			{name: 'dim', postfix: 'dim', pattern: /^[a-g][#b]?dim(\/[a-g][#b]?)?$/i, notes: [0, 3, 6]},
 			{name: 'dim7', postfix: 'dim<sup>7</sup>', pattern: /^[a-g][#b]?dim7(\/[a-g][#b]?)?$/i, notes: [0, 3, 6, 9]},
 			{name: 'minor add 9', postfix: 'm<sup>add9</sup>', pattern: /^[a-g][#b]?(m|min)add9(\/[a-g][#b]?)?$/i, notes: [0, 3, 7, 14]},
@@ -631,6 +634,16 @@
 					}
 				}
 				
+				console.log ($('#chords').get(0).selectionStart);
+				console.log ($('#chords').val().length);
+				if ( $('#chords').get(0).selectionStart >= $('#chords').val().length )
+				{
+					console.log ('down');
+					console.log ($('#content').height());
+					$([document.documentElement, document.body]).animate({
+						scrollTop: $(document).height()
+					}, 100);
+				}
 				return sequence;
 			//}
 		}
