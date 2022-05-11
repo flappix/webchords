@@ -317,9 +317,9 @@
 			{name: 'minor9', postfix: 'm<sup>9</sup>', pattern: /^[a-g][#b]?(m|min)9(\/[a-g][#b]?)?$/i, notes: [0, 3, 7, 10, 14]},
 			{name: 'major add 9', postfix: '<sup>add9</sup>', pattern: /^[a-g][#b]?add9(\/[a-g][#b]?)?$/i, notes: [0, 4, 7, 14]},
 			{name: 'major add 9 flat 5', postfix: '<sup>add9♭5</sup>', pattern: /^[a-g][#b]?add9b5(\/[a-g][#b]?)?$/i, notes: [0, 4, 6, 14]},
-			{name: 'augumented', postfix: 'aug', pattern: /^[a-g][#b]?aug(\/[a-g][#b]?)?$/i, notes: [0, 4, 8]},
-			{name: 'augumented 7', postfix: 'aug7', pattern: /^[a-g][#b]?aug7(\/[a-g][#b]?)?$/i, notes: [0, 4, 8, 10]},
-			{name: 'augumented maj7', postfix: 'aug<sup>(maj7)</sup>', pattern: /^[a-g][#b]?augmaj7(\/[a-g][#b]?)?$/i, notes: [0, 4, 8, 11]},
+			{name: 'augumented', postfix: 'aug', pattern: /^[a-g][#b]?(aug|\+)(\/[a-g][#b]?)?$/i, notes: [0, 4, 8]},
+			{name: 'augumented 7', postfix: 'aug7', pattern: /^[a-g][#b]?(aug|\+)7(\/[a-g][#b]?)?$/i, notes: [0, 4, 8, 10]},
+			{name: 'augumented maj7', postfix: 'aug<sup>(maj7)</sup>', pattern: /^[a-g][#b]?(aug|\+)maj7(\/[a-g][#b]?)?$/i, notes: [0, 4, 8, 11]},
 			{name: 'sus2', postfix: 'sus2', pattern: /^[a-g][#b]?sus2(\/[a-g][#b]?)?$/i, notes: [0, 2, 7]},
 			{name: 'sus4', postfix: 'sus4', pattern: /^[a-g][#b]?sus4(\/[a-g][#b]?)?$/i, notes: [0, 5, 7]},
 			{name: 'sus2flat5', postfix: 'sus2', pattern: /^[a-g][#b]?sus2b5(\/[a-g][#b]?)?$/i, notes: [0, 2, 6]},
@@ -634,16 +634,13 @@
 					}
 				}
 				
-				console.log ($('#chords').get(0).selectionStart);
-				console.log ($('#chords').val().length);
 				if ( $('#chords').get(0).selectionStart >= $('#chords').val().length )
 				{
-					console.log ('down');
-					console.log ($('#content').height());
 					$([document.documentElement, document.body]).animate({
 						scrollTop: $(document).height()
 					}, 100);
 				}
+				
 				return sequence;
 			//}
 		}
