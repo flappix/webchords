@@ -270,6 +270,14 @@
 		.ui-resizable-s {
 			height: 20px !important;
 		}
+		
+		.optionGroup
+		{
+			background-color: rgba(0,0,0,0.2);
+			border-radius: 10px;
+			padding: 5px;
+			margin: 5px;
+		}
 	</style>
 </head>
 
@@ -376,8 +384,8 @@
 		let velocity= 127;
 		let channel = {'chord': 0, 'drum': 1};
 		
-		let loop_label_play = '<i class="fas fa-play"></i> Loop';
-		let loop_label_stop = '<i class="fas fa-stop"></i> Stop';
+		let loop_label_play = '<i class="fa fa-play"></i> Loop';
+		let loop_label_stop = '<i class="fa fa-stop"></i> Stop';
 		
 		let drum_sound = 42;
 		
@@ -404,11 +412,9 @@
 			{				
 				if (play == true)
 				{
-					
-						
 					if (seq[bar_c][chord_c].notes != null)
 					{
-						
+						let inversion = seq[bar_c][chord_c].notes;
 						if (last_chord)
 						{
 							//MIDI.chordOff (channel['chord'], last_chord, velocity, 0);
@@ -418,9 +424,17 @@
 							}
 						}
 						
+						if (bar_c > 0 || chord_c > 0)
+						{
+							if ( $('#voice_leading').is (':checked') )
+							{
+								inversion = voiceLeading (last_chord, inversion);
+							}
+						}
+						
 						MIDI.setVolume (channel['chord'], volume['chord']);
 						
-						for (let n of seq[bar_c][chord_c].notes)
+						for (let n of inversion)
 						{
 							let vel_off = linearTrans (100, 127, 0, 127, humanize);
 							let vel =  (127 - vel_off) + Math.floor ( Math.random() * vel_off );
@@ -428,8 +442,8 @@
 							MIDI.noteOn (channel['chord'], n, vel, off);
 							
 							  $([document.documentElement, document.body]).animate({
-        scrollTop: $(`#chord_${bar_c}_${chord_c}`).offset().top - $('#content').height()
-    }, 100);
+									scrollTop: $(`#chord_${bar_c}_${chord_c}`).offset().top - $('#content').height()
+								}, 100);
 						}
 						//MIDI.chordOn (channel['chord'], seq[bar_c][chord_c].notes, velocity, 0);
 						
@@ -592,11 +606,12 @@
 											}
 										}
 										
+										// add bass note
 										// slash chords
 										let slash_group = m.length - 1;
 										if (m.length >= 2 && m[slash_group] != null && m[slash_group][0] == '/')
 										{
-											chord.notes.push ( map[m[slash_group].slice(1)] + (octave -1 ) * 12 );
+											chord.notes.unshift ( map[m[slash_group].slice(1)] + (octave -1 ) * 12 );
 											if (m[slash_group].length > 2 && m[slash_group][m[slash_group].length - 1] == 'b')
 											{
 												chord.symbol += m[slash_group].toUpperCase().substring (0, m[slash_group].length - 1) + '♭';
@@ -606,6 +621,10 @@
 												chord.symbol += m[slash_group].toUpperCase();
 											}
 											
+										}
+										else // normal chord (no slash)
+										{
+											chord.notes.unshift (root - 12);
 										}
 										
 										bar.push (chord);
@@ -633,6 +652,9 @@
 						sequence.push (bar);
 					}
 				}
+				
+				let url = window.location.href.split('?')[0];
+				$('#share_link').val ( url + '?progression=' + encodeURIComponent ( $('#chords').val() ) );
 				
 				if ( $('#chords').get(0).selectionStart >= $('#chords').val().length )
 				{
@@ -737,7 +759,7 @@
 			{
 				if (d != null && d.trim() != '')
 				{
-					s += `<div class="loaditem"><span onclick="loadProgression ('${d}')">${d}</span> <i class="fas fa-trash" onclick="remove ('${d}')"></i></div>`;
+					s += `<div class="loaditem"><span onclick="loadProgression ('${d}')">${d}</span> <i class="fa fa-trash" onclick="remove ('${d}')"></i></div>`;
 				}
 			}
 			$('#load').html (s);
@@ -983,13 +1005,55 @@
 			
 		}
 		
+		 // returns inversion of chord2
+		function voiceLeading (chord1, chord2)
+		{
+			let result = [chord2[0]]; // keep bass note unchanged
+			for (let note2 of chord2.slice (1) ) // dont use bass note for voice leading
+			{
+				let minDiff = Infinity;
+				let minOctave = null;
+				for (let octave of [0, 12, -12])
+				{
+					for ( let note1 of chord1.slice (1) ) // dont use bass note for voice leading
+					{
+						let currDiff = Math.abs ( note1 - (note2 + octave) );
+						if (currDiff < minDiff)
+						{
+							minDiff = currDiff;
+							minOctave = octave;
+						}
+					}
+				}
+				
+				result.push (note2 + minOctave);
+			}
+			
+			return result;
+		}
+		
+		function copyClipboard()
+		{
+			console.log(1);
+			$('#share_link').select();
+			document.execCommand ('copy');
+		}
+		
 		$(document).ready ( () => {
 			
 			$('#content').resizable({
 				handles: "s",
 				maxHeight: $('#content').height()
 				});
-			console.log (1);
+			
+			const params = new Proxy (new URLSearchParams (window.location.search), {
+				get: (searchParams, prop) => searchParams.get(prop),
+			});
+			if (params.progression)
+			{
+				$('#chords').val (params.progression);
+			}
+			
 			sequence = parseInput();
 			render();
 					
@@ -1014,7 +1078,7 @@
 					//$('#loading').hide();
 					//$('#content').show();
 					
-					 $('#loop').html ('<i class="fas fa-play"></i> Loop');
+					 $('#loop').html ('<i class="fa fa-play"></i> Loop');
 					 $('#loop').removeAttr ('disabled'); 
 					 
 				}
@@ -1053,7 +1117,7 @@
 	<div style="position: -webkit-sticky;position: sticky; top: 0;">
 		<div id="content" style="text-align: center;">
 			<div id="header">
-				<h1><i class="fas fa-guitar"></i> ChordLooper</h1>
+				<h1><i class="fa fa-guitar"></i> ChordLooper</h1>
 				<a href="https://github.com/flappix/chordlooper" style="margin: 10px;">
 					<img src="GitHub-Mark-Light-64px.png" />
 				</a>
@@ -1063,30 +1127,35 @@
 			
 			
 			<br />
-			<span class="config"><i title="volume" class="fas fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"><br />
-			<span class="config"><i title="BPM" class="fas fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"><br />
-			<span class="config"><i title="Metronome volume" class="fas fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"><br />
-			<span class="config"><i title="Humanize" class="fas fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">20</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)">
+			<span class="config"><i title="volume" class="fa fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"><br />
+			<span class="config"><i title="BPM" class="fa fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"><br />
+			<span class="config"><i title="Metronome volume" class="fa fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"><br />
+			<span class="config"><i title="Humanize" class="fa fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">20</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)">
 			<div style="display: flex; justify-content: center; color: white;">
-				<div>Select chord sound <br /><select id="selectSound" onchange="selectSound()">
+				<div class="optionGroup">Select chord sound <br /><select id="selectSound" onchange="selectSound()">
 					<option value="acoustic_grand_piano">Piano</option>
 					<option value="acoustic_guitar_nylon">Classical guitar</option>
 					<option value="acoustic_guitar_steel">Western guitar</option>
 					<option value="electric_guitar_clean">Electric guitar clean</option>
 					<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
 				</select></div>
-				<div>Select metronome sound <br /><select id="selectDrum" onchange="selectDrum()">
+				<div class="optionGroup">Select metronome sound <br /><select id="selectDrum" onchange="selectDrum()">
 					<option value="42">HiHat</option>
 					<option value="39">Clap</option>
 					<option value="40">Snare</option>
 				</select></div>
+				
+				<div class="optionGroup">
+					<label><input type="checkbox" id="voice_leading" style="transform: scale(1.5); margin: 5px;" checked /><br /> Voice leading</label>
+				</div>
 			</div>
 			
-			<button onclick="loopUI()" type="button" id="loop" class="menu" disabled><i class="fas fa-play"></i> Loading soundfonts... <img src="loading.svg" /></button>
-			<button onclick="show ('examples')" type="button" id="showExample" class="menu"><i class="fas fa-flask"></i> Examples</button>
-			<button onclick="save()" id="save"><i class="fas fa-save"></i> Save</button>
-			<button onclick="show ('load')" type="button" id="showLoad" class="menu" disabled><i class="fas fa-folder-open"></i> Load</button>
-			<button onclick="show ('help');" type="button" id="showHelp" class="menu"><i class="fas fa-question-circle"></i> Help</button>
+			<button onclick="loopUI()" type="button" id="loop" class="menu" disabled><i class="fa fa-play"></i> Loading soundfonts... <img src="loading.svg" /></button>
+			<button onclick="show ('examples')" type="button" id="showExample" class="menu"><i class="fa fa-flask"></i> Examples</button>
+			<button onclick="save()" id="save"><i class="fa fa-save"></i> Save</button>
+			<button onclick="show ('load')" type="button" id="showLoad" class="menu" disabled><i class="fa fa-folder-open"></i> Load</button>
+			<button onclick="show ('help');" type="button" id="showHelp" class="menu"><i class="fa fa-question-circle"></i> Help</button>
+			<button onclick="show ('share');" type="button" id="showHelp" class="menu"><i class="fa fa-share"></i> Share</button>
 		</div>
 		<div id="examples"  class="menuItem" style="display: none;">
 			<div class="example" onclick="loadProgression ($(this).html());">Dm/F | Bbmaj7 | C | A7</div>
@@ -1101,6 +1170,13 @@
 			Use % to repeat the last chord<br />
 			Use _ to play pause<br />
 			Each chord is played equally long in each bar. E.g. putting 4 chords in one bar result in one chord every beat.
+		</div>
+		
+		<div id="share" class="menuItem" style="display: none;">
+			Send this link to a friend to share the current chord progression<br />
+			<div style="display: flex; align-items: center; justify-content: center;">
+				<input type="text" id="share_link" style="font-size: 1em;" > <button type="button" onclick="copyClipboard()">Copy to clipboard</button>
+			</div>
 		</div>
 
 		<div id="load" class="menuItem" style="display: none;">
