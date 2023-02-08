@@ -1,7 +1,7 @@
 
 # chordlooper
 
-Online tool for looping complex chord progressions on the fly.
+Online tool for creating and looping complex, jazzy chord progression on the fly.
 
 **Try it on https://flappix.github.io/chordlooper**
 
