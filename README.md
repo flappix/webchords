@@ -1,5 +1,8 @@
 
-# chordlooper
+# web chords
+
+![Screenshot](https://raw.githubusercontent.com/flappix/webchords/main/screenshot.jpg)
+
 
 Online tool for creating and looping complex, jazzy chord progression on the fly.
 
