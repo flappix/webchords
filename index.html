@@ -34,12 +34,13 @@
 	
 	<style>
 		:root {
-		  --chord-bg: #DAF0FF;
-		  --chord-bg-play: #80AABD;
-		  --chord-border-dark: #9DD4DC;
-		  --chord-border-light: #48849E;
-		  --button-bg: #63AADA;
-		  --button-border: #465864;
+		  --chord-bg: white;
+		  --chord-bg-play: white;
+		  --chord-border-dark: black;
+		  --chord-border-light: white;
+		  --button-fg: black;
+		  --button-bg: white;
+		  --button-border: black;
 		  --button-disabled: #8C8C8C;
 	  }
 		
@@ -53,18 +54,23 @@
 			padding: 0px;
 			margin: 0xp;
 			border-collapse: collapse;
-			background-image: url(background.jpg);
+			background-image: url(background_light.jpg);
+			background-position: fixed;
 			
+		}
+		
+		label
+		{
+			font-family: Sans-Serif;
 		}
 		
 		#content, #loading
 		{
 			
 			margin: 0px;
-			background: rgba(0, 0, 0, 0.3);
-			backdrop-filter: blur(20px);
+			background: rgba(0, 0, 0, 0.2);
 			overflow: hidden;
-			backdrop-filter: blur(20px);
+			backdrop-filter: blur(5px);
 		}
 		
 		.menuItem
@@ -72,7 +78,7 @@
 			font-size: 3em;
 			margin: 0px;
 			background: rgba(255, 255, 255, 0.5);
-			text-align: center;
+			padding: 20px;
 			backdrop-filter: blur(20px);
 		}
 		
@@ -83,7 +89,7 @@
 		
 		.example:hover, .loaditem:hover
 		{
-			background: rgba(255, 255, 255, 0.8);
+			background: rgba(0,0,0, 0.2);
 			cursor: pointer;
 			padding: 10px;
 		}
@@ -102,6 +108,7 @@
 		#parsed
 		{
 			margin: 0px auto;
+			padding-top: 20px;
 			display: flex;
 			flex-direction: column;
 			font-size: 5em;
@@ -122,35 +129,27 @@
 		
 		.chord
 		{
-			//margin: 10px;
-			margin: 0px;
+			margin: 10px;
 			display: inline-block;
 			background-color: var(--chord-bg);
 			border-radius: 10px;
-			//padding: 5px;
 			padding: 0px;
 			height: 100px;
-			border-bottom: 10px solid var(--chord-border-light);
-			border-right: 10px solid var(--chord-border-light);
-			border-top: 5px solid var(--chord-border-dark);
-			border-left: 5px solid var(--chord-border-dark);
-			text-shadow: 5px 5px var(--chord-border-dark);
+			box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+			
 			text-align: center;
 		}
 		
 		.play
 		{
 			background-color: var(--chord-bg-play);
-			border-bottom: 5px solid var(--chord-border-light);
-			border-right: 5px solid var(--chord-border-light);
-			border-top: 10px solid var(--chord-border-dark);
-			border-left: 10px solid var(--chord-border-dark);
-			text-shadow: 5px 5px #48849E;
+			box-shadow: rgba(0, 0, 0, 0.3) 0px 4px 12px;
 		}
 		
 		input[type=range] {
 		  -webkit-appearance: none;
-		  width: 50%;
+		  -moz-appearance: none;
+		  min-width: 400px;
 		  height: 25px;
 		  background: #d3d3d3;
 		  outline: none;
@@ -165,6 +164,7 @@
 
 		input[type=range]::-webkit-slider-thumb {
 		  -webkit-appearance: none;
+		  -moz-appearance: none;
 		  appearance: none;
 		  width: 25px;
 		  height: 25px;
@@ -180,10 +180,10 @@
 		}
 		
 		button, select, option {
+		  color: var(--button-fg);
 		  background-color: var(--button-bg);
 		  border: 4px solid var(--button-border);
-		  color: white;
-		  padding: 15px 32px;
+		  padding: 8px 32px;
 		  text-align: center;
 		  text-decoration: none;
 		  display: inline-block;
@@ -219,8 +219,8 @@
 		
 		h1
 		{
-			font-size: 4em;
-			color: #80AABD;
+			font-size: 2.5em;
+			color: white;
 			text-align: center;
 			margin: 0px auto;
 		}
@@ -229,6 +229,7 @@
 		{
 			background-color: rgba(0,0,0,0.7);
 			display: flex;
+			height: 50px;
 		}
 			
 		
@@ -247,7 +248,6 @@
 		
 		select
 		{
-			//background-color: 
 		}
 		
 		.loaditem
@@ -263,8 +263,9 @@
 		
 		.transposeDisplay
 		{
-			color: var(--chord-bg-play);
+			color: black;
 			width: 50px;
+			font-size: 2em;
 		}
 		
 		.ui-resizable-s {
@@ -400,7 +401,7 @@
 		
 		let last_chord;
 		
-		let humanize = 20;
+		let humanize = 10;
 		
 		function bar_length()
 		{
@@ -449,7 +450,7 @@
 							MIDI.noteOn (channel['chord'], n, vel, off);
 							
 							  $([document.documentElement, document.body]).animate({
-									scrollTop: $(`#chord_${bar_c}_${chord_c}`).offset().top - $('#content').height()
+									scrollTop: $(`#chord_${bar_c}_${chord_c}`).offset().top - ( $('#content').height() + 100 )
 								}, 100);
 						}
 						//MIDI.chordOn (channel['chord'], seq[bar_c][chord_c].notes, velocity, 0);
@@ -958,9 +959,8 @@
 		
 		function show (id)
 		{
-			$('.menuItem').hide();
-			$('#' + id).show();
-			
+			$('.menuItem').not ('#' + id).hide();
+			$('#' + id).toggle();
 		}
 		
 		function loadProgression (prog)
@@ -1041,7 +1041,6 @@
 		
 		function copyClipboard()
 		{
-			console.log(1);
 			$('#share_link').select();
 			document.execCommand ('copy');
 		}
@@ -1120,49 +1119,59 @@
 			
 						
 	</script>
-	<!--<div id="loading"><h1>... Loading ...<span id="progress">0%</span></h1></div>-->
-	<div style="position: -webkit-sticky;position: sticky; top: 0;">
-		<div id="content" style="text-align: center;">
-			<div id="header">
-				<h1><i class="fa fa-guitar"></i> ChordLooper</h1>
-				<a href="https://github.com/flappix/chordlooper" style="margin: 10px;">
-					<img src="GitHub-Mark-Light-64px.png" />
+	<div style="position: -webkit-sticky;position: sticky; top: 0; box-shadow: 0px 10px 20px -10px black;">
+		<div id="content" style="text-align: center; padding-bottom: 10px;">
+			<div id="header" style="display: flex; justify-content: space-evenly; align-items: center;">
+				<h1 style="flex-grow: 1; background-color: #343434;"><i class="fa fa-guitar"></i> ChordLooper</h1>
+				
+				<div style="flex-grow: 4;">
+					<button onclick="loopUI()" type="button" id="loop" class="menu" disabled><i class="fa fa-play"></i> Loading soundfonts... <img src="loading.svg" /></button>
+					<button onclick="show ('examples')" type="button" id="showExample" class="menu"><i class="fa fa-flask"></i> Examples</button>
+					<button onclick="save()" id="save"><i class="fa fa-save"></i> Save</button>
+					<button onclick="show ('load')" type="button" id="showLoad" class="menu" disabled><i class="fa fa-folder-open"></i> Load</button>
+					<button onclick="show ('share');" type="button" id="showHelp" class="menu"><i class="fa fa-share-alt"></i> Share</button>
+					<button onclick="show ('help');" type="button" id="showHelp" class="menu"><i class="fa fa-question-circle"></i> Help</button>
+				</div>
+				
+				<a href="https://github.com/flappix/chordlooper" style="flex-grow: 1;">
+					<img src="GitHub-Mark-Light-64px.png" width="40px;" />
 				</a>
+				
 			</div>
 			
-			<span id="transposeDownDisplay" class="transposeDisplay"></span>  <button class="transpose" title="transpose down half step" onclick="transpose (-1)">&#x2B07;</button>  <input type="text" id="chords" value="Am7 Dmadd9 | G7 Cmaj7 | Fmaj7/C Bm7b5 | E7/G#" /> <button title="transpose up half step" class="transpose" onclick="transpose (1)">&#x2B06;</button> <span class="transposeDisplay" id="transposeUpDisplay"></span> <br />
+			<span id="transposeDownDisplay" class="transposeDisplay"></span>  <button class="transpose" title="transpose down half step" onclick="transpose (-1)">&#x2B07;</button>  <input type="text" id="chords" value="A7 D9 | G7 Cmaj7 | Fmaj7 Bm7b5 | Esus4 % Eadd9 E/G#" /> <button title="transpose up half step" class="transpose" onclick="transpose (1)">&#x2B06;</button> <span class="transposeDisplay" id="transposeUpDisplay"></span> <br />
 			
 			
 			<br />
-			<span class="config"><i title="volume" class="fa fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"><br />
-			<span class="config"><i title="BPM" class="fa fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"><br />
-			<span class="config"><i title="Metronome volume" class="fa fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"><br />
-			<span class="config"><i title="Humanize" class="fa fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">20</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)">
-			<div style="display: flex; justify-content: center; color: white;">
-				<div class="optionGroup">Select chord sound <br /><select id="selectSound" onchange="selectSound()">
-					<option value="acoustic_grand_piano">Piano</option>
-					<option value="acoustic_guitar_nylon">Classical guitar</option>
-					<option value="acoustic_guitar_steel">Western guitar</option>
-					<option value="electric_guitar_clean">Electric guitar clean</option>
-					<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
-				</select></div>
-				<div class="optionGroup">Select metronome sound <br /><select id="selectDrum" onchange="selectDrum()">
-					<option value="42">HiHat</option>
-					<option value="39">Clap</option>
-					<option value="40">Snare</option>
-				</select></div>
-				
-				<div class="optionGroup">
-					<label><input type="checkbox" id="voice_leading" style="transform: scale(1.5); margin: 5px;" checked /><br /> Voice leading</label>
+			<div style="display: flex;">
+				<div style="flex-grow: 1;">
+					<div class="optionGroup"><span class="config"><i title="volume" class="fa fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"></div>
+					<div class="optionGroup"><span class="config"><i title="Metronome volume" class="fa fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"></div>
 				</div>
+				<div style="flex-grow: 1;">
+					<div class="optionGroup"><span class="config"><i title="BPM" class="fa fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"></div>
+					<div class="optionGroup"><span class="config"><i title="Humanize" class="fa fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">10</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)"></div>
+				</div>
+				<div style="display: flex; flex-grow: 1; justify-content: center; color: white;">
+					<div class="optionGroup"><label>Select chord sound <br /><select id="selectSound" onchange="selectSound()">
+						<option value="acoustic_grand_piano">Piano</option>
+						<option value="acoustic_guitar_nylon">Classical guitar</option>
+						<option value="acoustic_guitar_steel">Western guitar</option>
+						<option value="electric_guitar_clean">Electric guitar clean</option>
+						<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
+					</select></label></div>
+					<div class="optionGroup"><label>Select metronome sound <br /><select id="selectDrum" onchange="selectDrum()">
+						<option value="42">HiHat</option>
+						<option value="39">Clap</option>
+						<option value="40">Snare</option>
+					</select></label></div>
+					
+					<div class="optionGroup">
+						<label><input type="checkbox" id="voice_leading" style="transform: scale(1.5); margin: 5px; accent-color: #34495e;" checked /><br /> Voice leading</label>
+					</div>
+				</div>
+				
 			</div>
-			
-			<button onclick="loopUI()" type="button" id="loop" class="menu" disabled><i class="fa fa-play"></i> Loading soundfonts... <img src="loading.svg" /></button>
-			<button onclick="show ('examples')" type="button" id="showExample" class="menu"><i class="fa fa-flask"></i> Examples</button>
-			<button onclick="save()" id="save"><i class="fa fa-save"></i> Save</button>
-			<button onclick="show ('load')" type="button" id="showLoad" class="menu" disabled><i class="fa fa-folder-open"></i> Load</button>
-			<button onclick="show ('help');" type="button" id="showHelp" class="menu"><i class="fa fa-question-circle"></i> Help</button>
-			<button onclick="show ('share');" type="button" id="showHelp" class="menu"><i class="fa fa-share"></i> Share</button>
 		</div>
 		<div id="examples"  class="menuItem" style="display: none;">
 			<div class="example" onclick="loadProgression ($(this).html());">Dm/F | Bbmaj7 | C | A7</div>
@@ -1170,7 +1179,7 @@
 			<div class="example" onclick="loadProgression ($(this).html());">Em Esus2 Em Esus4, Cadd#4 Amadd9, F7 E7, B7/C % F#dim D#dim</div>
 		</div>
 		
-		<div id="help" class="menuItem" style="display: none;">
+		<div id="help" class="menuItem" style="display: none; font-family: Sans-serif;">
 			Enter chord symbols in the text field.<br />
 			Separate chords with a space.<br />
 			Separate bars with a | , or ;<br />
@@ -1179,10 +1188,10 @@
 			Each chord is played equally long in each bar. E.g. putting 4 chords in one bar result in one chord every beat.
 		</div>
 		
-		<div id="share" class="menuItem" style="display: none;">
+		<div id="share" class="menuItem" style="display: none; font-family: Sans-serif; text-align: center;">
 			Send this link to a friend to share the current chord progression<br />
 			<div style="display: flex; align-items: center; justify-content: center;">
-				<input type="text" id="share_link" style="font-size: 1em;" > <button type="button" onclick="copyClipboard()">Copy to clipboard</button>
+				<input type="text" id="share_link" style="font-size: 1em; border: 3px solid black; margin-right: 20px;" > <button type="button" onclick="copyClipboard()" style="font-size: 0.5em;"><i class="fa fa-clipboard"></i> Copy to clipboard</button>
 			</div>
 		</div>
 
@@ -1190,6 +1199,7 @@
 		</div>
 	</div>
 	
+	<!-- chords will be placed here -->
 	<div id="parsed"></div>
 	</div>
 </body>
