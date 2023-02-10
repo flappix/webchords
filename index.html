@@ -229,7 +229,7 @@
 		{
 			background-color: rgba(0,0,0,0.7);
 			display: flex;
-			height: 50px;
+			padding: 0px;
 		}
 			
 		
@@ -1121,10 +1121,10 @@
 	</script>
 	<div style="position: -webkit-sticky;position: sticky; top: 0; box-shadow: 0px 10px 20px -10px black;">
 		<div id="content" style="text-align: center; padding-bottom: 10px;">
-			<div id="header" style="display: flex; justify-content: space-evenly; align-items: center;">
-				<h1 style="flex-grow: 1; background-color: #343434;"><i class="fa fa-guitar"></i> WebChords</h1>
+			<div id="header" style="display: flex; justify-content: space-evenly; align-items: stretch;">
+				<div style="flex-grow: 1; background-color: #343434; display: flex; align-items: center;"><h1><i class="fa fa-guitar"></i> WebChords</h1></div>
 				
-				<div style="flex-grow: 4;">
+				<div style="flex-grow: 4; padding: 5px;">
 					<button onclick="loopUI()" type="button" id="loop" class="menu" disabled><i class="fa fa-play"></i> Loading soundfonts... <img src="loading.svg" /></button>
 					<button onclick="show ('examples')" type="button" id="showExample" class="menu"><i class="fa fa-flask"></i> Examples</button>
 					<button onclick="save()" id="save"><i class="fa fa-save"></i> Save</button>
