@@ -68,8 +68,9 @@
 		{
 			
 			margin: 0px;
-			background: rgba(0, 0, 0, 0.2);
+			background: rgba(0, 0, 0, 0.4);
 			overflow: hidden;
+			-webkit-backdrop-filter: blur(5px);
 			backdrop-filter: blur(5px);
 		}
 		
@@ -80,6 +81,7 @@
 			background: rgba(255, 255, 255, 0.5);
 			padding: 20px;
 			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
 		}
 		
 		.example, .loaditem
@@ -274,10 +276,11 @@
 		
 		.optionGroup
 		{
-			background-color: rgba(0,0,0,0.2);
+			background-color: rgba(0,0,0,0.4);
 			border-radius: 10px;
 			padding: 5px;
 			margin: 5px;
+
 		}
 	</style>
 </head>
@@ -1150,33 +1153,35 @@
 			
 			<br />
 			<div style="display: flex;">
-				<div style="flex-grow: 1;">
-					<div class="optionGroup"><span class="config"><i title="volume" class="fa fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"></div>
-					<div class="optionGroup"><span class="config"><i title="Metronome volume" class="fa fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"></div>
-				</div>
-				<div style="flex-grow: 1;">
-					<div class="optionGroup"><span class="config"><i title="BPM" class="fa fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"></div>
-					<div class="optionGroup"><span class="config"><i title="Humanize" class="fa fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">10</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)"></div>
-				</div>
-				<div style="display: flex; flex-grow: 1; justify-content: center; color: white;">
-					<div class="optionGroup"><label>Select chord sound <br /><select id="selectSound" onchange="selectSound()">
-						<option value="acoustic_grand_piano">Piano</option>
-						<option value="acoustic_guitar_nylon">Classical guitar</option>
-						<option value="acoustic_guitar_steel">Western guitar</option>
-						<option value="electric_guitar_clean">Electric guitar clean</option>
-						<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
-					</select></label></div>
-					<div class="optionGroup"><label>Select metronome sound <br /><select id="selectDrum" onchange="selectDrum()">
-						<option value="42">HiHat</option>
-						<option value="39">Clap</option>
-						<option value="40">Snare</option>
-					</select></label></div>
-					
-					<div class="optionGroup">
-						<label><input type="checkbox" id="voice_leading" style="transform: scale(1.5); margin: 5px; accent-color: #34495e;" checked /><br /> Voice leading</label>
+				<i class="fa fa-eye-slash" onclick="$('#options').toggle()" style="color: white; margin: 5px;" title="hide/show options"></i>
+				<div style="display: flex;" id="options">
+					<div style="flex-grow: 1;">
+						<div class="optionGroup"><span class="config"><i title="volume" class="fa fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"></div>
+						<div class="optionGroup"><span class="config"><i title="Metronome volume" class="fa fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"></div>
+					</div>
+					<div style="flex-grow: 1;">
+						<div class="optionGroup"><span class="config"><i title="BPM" class="fa fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"></div>
+						<div class="optionGroup"><span class="config"><i title="Humanize" class="fa fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">10</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)"></div>
+					</div>
+					<div style="display: flex; flex-grow: 1; justify-content: center; color: white;">
+						<div class="optionGroup"><label>Select chord sound <br /><select id="selectSound" onchange="selectSound()">
+							<option value="acoustic_grand_piano">Piano</option>
+							<option value="acoustic_guitar_nylon">Classical guitar</option>
+							<option value="acoustic_guitar_steel">Western guitar</option>
+							<option value="electric_guitar_clean">Electric guitar clean</option>
+							<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
+						</select></label></div>
+						<div class="optionGroup"><label>Select metronome sound <br /><select id="selectDrum" onchange="selectDrum()">
+							<option value="42">HiHat</option>
+							<option value="39">Clap</option>
+							<option value="40">Snare</option>
+						</select></label></div>
+						
+						<div class="optionGroup">
+							<label><input type="checkbox" id="voice_leading" style="transform: scale(1.5); margin: 5px; accent-color: #34495e;" checked /><br /> Voice leading</label>
+						</div>
 					</div>
 				</div>
-				
 			</div>
 		</div>
 		<div id="examples"  class="menuItem" style="display: none;">
