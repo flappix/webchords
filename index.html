@@ -964,6 +964,7 @@
 		{
 			$('.menuItem').not ('#' + id).hide();
 			$('#' + id).toggle();
+			window.scrollTo (0, 0);
 		}
 		
 		function loadProgression (prog)
@@ -1132,7 +1133,7 @@
 					<button onclick="show ('examples')" type="button" id="showExample" class="menu"><i class="fa fa-flask"></i> Examples</button>
 					<button onclick="save()" id="save"><i class="fa fa-save"></i> Save</button>
 					<button onclick="show ('load')" type="button" id="showLoad" class="menu" disabled><i class="fa fa-folder-open"></i> Load</button>
-					<button onclick="show ('share');" type="button" id="showHelp" class="menu"><i class="fa fa-share-alt"></i> Share</button>
+					<button onclick="show ('share');" type="button" id="showShare" class="menu"><i class="fa fa-share-alt"></i> Share</button>
 					<button onclick="show ('help');" type="button" id="showHelp" class="menu"><i class="fa fa-question-circle"></i> Help</button>
 				</div>
 				
@@ -1184,30 +1185,31 @@
 				</div>
 			</div>
 		</div>
-		<div id="examples"  class="menuItem" style="display: none;">
-			<div class="example" onclick="loadProgression ($(this).html());">Dm/F | Bbmaj7 | C | A7</div>
-			<div class="example" onclick="loadProgression ($(this).html());">Cmadd9 % Ab6 Ebmaj7 | Ebaug Ddim7 _ G7/Ab | _ Ab7 % G7</div>
-			<div class="example" onclick="loadProgression ($(this).html());">Em Esus2 Em Esus4, Cadd#4 Amadd9, F7 E7, B7/C % F#dim D#dim</div>
+	</div>
+	
+	<div id="examples"  class="menuItem" style="display: none;">
+		<div class="example" onclick="loadProgression ($(this).html());">Dm/F | Bbmaj7 | C | A7</div>
+		<div class="example" onclick="loadProgression ($(this).html());">Cmadd9 % Ab6 Ebmaj7 | Ebaug Ddim7 _ G7/Ab | _ Ab7 % G7</div>
+		<div class="example" onclick="loadProgression ($(this).html());">Em Esus2 Em Esus4, Cadd#4 Amadd9, F7 E7, B7/C % F#dim D#dim</div>
+	</div>
+	
+	<div id="help" class="menuItem" style="display: none; font-family: Sans-serif;">
+		Enter chord symbols in the text field.<br />
+		Separate chords with a space.<br />
+		Separate bars with a | , or ;<br />
+		Use % to repeat the last chord<br />
+		Use _ to play pause<br />
+		Each chord is played equally long in each bar. E.g. putting 4 chords in one bar result in one chord every beat.
+	</div>
+	
+	<div id="share" class="menuItem" style="display: none; font-family: Sans-serif; text-align: center;">
+		Send this link to a friend to share the current chord progression<br />
+		<div style="display: flex; align-items: center; justify-content: center;">
+			<input type="text" id="share_link" style="font-size: 1em; border: 3px solid black; margin-right: 20px;" > <button type="button" onclick="copyClipboard()" style="font-size: 0.5em;"><i class="fa fa-clipboard"></i> Copy to clipboard</button>
 		</div>
-		
-		<div id="help" class="menuItem" style="display: none; font-family: Sans-serif;">
-			Enter chord symbols in the text field.<br />
-			Separate chords with a space.<br />
-			Separate bars with a | , or ;<br />
-			Use % to repeat the last chord<br />
-			Use _ to play pause<br />
-			Each chord is played equally long in each bar. E.g. putting 4 chords in one bar result in one chord every beat.
-		</div>
-		
-		<div id="share" class="menuItem" style="display: none; font-family: Sans-serif; text-align: center;">
-			Send this link to a friend to share the current chord progression<br />
-			<div style="display: flex; align-items: center; justify-content: center;">
-				<input type="text" id="share_link" style="font-size: 1em; border: 3px solid black; margin-right: 20px;" > <button type="button" onclick="copyClipboard()" style="font-size: 0.5em;"><i class="fa fa-clipboard"></i> Copy to clipboard</button>
-			</div>
-		</div>
+	</div>
 
-		<div id="load" class="menuItem" style="display: none;">
-		</div>
+	<div id="load" class="menuItem" style="display: none;">
 	</div>
 	
 	<!-- chords will be placed here -->
