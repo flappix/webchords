@@ -8,6 +8,8 @@ Online tool for creating and looping complex, jazzy chord progressions on the fl
 
 **Try it on https://flappix.github.io/webchords**
 
+Feel free to report bugs or feature requests in the issue section.
+
 ## Features
 - Chord recognition as you type on the keyboard
 - Recognition of complex chords like **Fbm<sup>add4</sup>/G** or **G#<sup>maj9b5</sup>**
