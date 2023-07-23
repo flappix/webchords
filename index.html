@@ -899,6 +899,7 @@
 						chord_element.click ( function()
 						{
 							stop();
+							$('.chord').removeClass ('play');
 							$(this).addClass ('play');
 							start_at_bar = b;
 							start_at_chord = c;
