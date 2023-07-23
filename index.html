@@ -1003,6 +1003,9 @@
 		
 		function loadProgression (prog)
 		{
+			start_at_bar = 0;
+			start_at_chord = 0;
+			
 			$('#chords').val (prog);
 			stop();
 			sequence = parseInput();
@@ -1106,7 +1109,7 @@
 				//soundfontUrl: "MIDI.js/examples/soundfont/",
 				soundfontUrl: "soundfonts/FluidR3_GM/",
 				//soundfontUrl: "soundfonts/choir/",
-				instruments: ['acoustic_grand_piano', 'choir_aahs', 'cello', 'acoustic_guitar_nylon', 'acoustic_guitar_steel', 'electric_guitar_clean', 'steel_drums', 'pad_2_warm'],
+				instruments: ['acoustic_grand_piano', 'acoustic_guitar_nylon', 'acoustic_guitar_steel', 'electric_guitar_clean', 'steel_drums', 'pad_2_warm'],
 				//instrument: 'acoustic_guitar_nylon',
 				/*onprogress: function(state, progress) {
 					if (state == 'load')
@@ -1201,8 +1204,6 @@
 					<div style="display: flex; flex-grow: 1; justify-content: center; color: white;">
 						<div class="optionGroup"><label>Select chord sound <br /><select id="selectSound" onchange="selectSound()">
 							<option value="acoustic_grand_piano">Piano</option>
-							<option value="choir_aahs">Choir</option>
-							<option value="cello">Cello</option>
 							<option value="acoustic_guitar_nylon">Classical guitar</option>
 							<option value="acoustic_guitar_steel">Western guitar</option>
 							<option value="electric_guitar_clean">Electric guitar clean</option>
