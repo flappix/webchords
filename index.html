@@ -151,6 +151,12 @@
 			box-shadow: rgba(0, 0, 0, 0.3) 0px 4px 12px;
 		}
 		
+		input[type=number] {
+		  padding: 0.5em;
+		  font-weight: bold;
+		  border: 4px solid var(--button-border);
+		}
+		
 		input[type=range] {
 		  -webkit-appearance: none;
 		  -moz-appearance: none;
@@ -489,7 +495,7 @@
 						MIDI.setVolume (channel['drum'], volume['drum']);
 						MIDI.noteOn (channel['drum'], drum_sound, 127, 0);
 						
-						let beats = $('#time_signature').val();
+						let beats = $('#beats_per_bar').val();
 						for (let b=1; b<beats; b++)
 						{
 							MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / beats) * b );
@@ -757,22 +763,29 @@
 			humanize = $('#humanize').val();
 		}
 		
+		function loadLocalStorage()
+		{
+			let docs = localStorage.getItem ('docs') ? localStorage.getItem ('docs') : '[]';
+			try {
+				// new json format
+				docs = JSON.parse (docs);
+			} catch (e) {
+				docs = ( docs.split ('+++').filter ( d => d != '' ) || []).map ( (p) => ({'beats': 4, progression: p}) ); // stay compatible with old string format
+			};
+			
+			return docs;
+		}
+		
+		
 		function save()
 		{
-			let docs = localStorage.getItem ('docs');
-			if (docs)
+			let docs = loadLocalStorage();
+			if ( docs.filter ( d => d.progression.trim() == $('#chords').val().trim() ).length == 0 )
 			{
-				if ( !docs.includes ( '+++' + $('#chords').val().trim() + '+++' ) )
-				{
-					docs = '+++' + $('#chords').val() + '+++' + docs;
-				}
-			}
-			else
-			{
-				docs =  '+++' + $('#chords').val() +  '+++';
+				docs.push ({progression: $('#chords').val().trim(), beats: $('#beats_per_bar').val()});
 			}
 			
-			localStorage.setItem ('docs', docs);
+			localStorage.setItem ('docs', JSON.stringify (docs) );
 			updateloadlist();
 			
 			$('#save').animate({
@@ -790,15 +803,18 @@
 		
 		function updateloadlist()
 		{
-			let docs = localStorage.getItem ('docs') ? localStorage.getItem ('docs').split ('+++') : [];
+			let docs = loadLocalStorage();
 			
 			$('#load').empty();
 			let s = '';
 			for (let d of docs)
 			{
-				if (d != null && d.trim() != '')
+				console.log (d?.progression);
+				//console.log (d?.progression.trim());
+				if (d && d.progression && d.progression.trim() != '')
 				{
-					s += `<div class="loaditem"><span onclick="loadProgression ('${d}')">${d}</span> <i class="fa fa-trash" onclick="remove ('${d}')"></i></div>`;
+					console.log (parseInt (d.beats));
+					s += `<div class="loaditem"><span onclick="loadProgression ('${d.progression}', ${parseInt (d.beats)})">${d.progression}</span> <i class="fa fa-trash" onclick="remove ('${d.progression}')"></i></div>`;
 				}
 			}
 			$('#load').html (s);
@@ -815,11 +831,14 @@
 		
 		function remove (str)
 		{
-			if ( localStorage.getItem ('docs') != null )
+			let docs = loadLocalStorage().filter ( d => d.progression != 'str' );
+			localStorage.setItem ('docs', JSON.stringify (docs) );
+			
+			if (docs != null )
 			{
-				let docs = localStorage.getItem ('docs');
-				docs = docs.replace (str + '+++', '');
-				localStorage.setItem ('docs', docs);
+				
+				docs.progression = docs.replace (str + '+++', '');
+				
 				updateloadlist();
 			}
 		}
@@ -1004,9 +1023,18 @@
 			$('.menuItem').not ('#' + id).hide();
 			$('#' + id).toggle();
 			window.scrollTo (0, 0);
+			
+			if (! ['play', 'save'].includes (id) )
+			{
+				$('#parsed').hide();
+			}
+			else
+			{
+				$('#parsed').show();
+			}
 		}
 		
-		function loadProgression (prog)
+		function loadProgression (prog, beats=4)
 		{
 			start_at_bar = 0;
 			start_at_chord = 0;
@@ -1017,6 +1045,12 @@
 			render();
 			$('.menuItem').hide();
 			$('#loop').html (loop_label_play);
+			
+			$('#beats_per_bar').val (beats);
+			
+			$('#parsed').show();
+			setTimeout ( function() { window.scrollTo (0, 0); }, 1000 );
+			
 		}
 		
 		function toggleMetronome()
@@ -1174,7 +1208,7 @@
 					<button onclick="loopUI()" type="button" id="loop" class="menu" disabled><i class="fa fa-play"></i> Loading soundfonts... <img src="loading.svg" /></button>
 					<button onclick="show ('examples')" type="button" id="showExample" class="menu"><i class="fa fa-flask"></i> Examples</button>
 					<button onclick="save()" id="save"><i class="fa fa-save"></i> Save</button>
-					<button onclick="show ('load')" type="button" id="showLoad" class="menu" disabled><i class="fa fa-folder-open"></i> Load</button>
+					<button onclick="show ('load');" type="button" id="showLoad" class="menu" disabled><i class="fa fa-folder-open"></i> Load</button>
 					<button onclick="show ('share');" type="button" id="showShare" class="menu"><i class="fa fa-share-alt"></i> Share</button>
 					<button onclick="show ('help');" type="button" id="showHelp" class="menu"><i class="fa fa-question-circle"></i> Help</button>
 				</div>
@@ -1216,8 +1250,8 @@
 						</select></label></div>
 						<div class="optionGroup">
 							
-							<label>time signature <br />
-								<input type="number" value="4" min="1" step="1" id="time_signature" style="width: 2em;" /> / 4
+							<label>beats per bar <br />
+								<input type="number" value="4" min="1" step="1" id="beats_per_bar" style="width: 2em;" />
 							</label>
 							
 							<label>Select metronome sound <br />
