@@ -1247,12 +1247,12 @@
 					<i class="fa fa-eye-slash" onclick="$('#options').toggle()" style="color: white; margin: 5px;" title="hide/show options"></i>
 					<div style="display: flex; width: 100%;" id="options">
 						<div style="flex-grow: 1;">
-							<div class="optionGroup"><span class="config"><i title="volume" class="fa fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"></div>
-							<div class="optionGroup"><span class="config"><i title="Metronome volume" class="fa fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"></div>
+							<div class="optionGroup" title="chord volume"><span class="config"><i  class="fa fa-music" style="margin-right: 5px;"></i><i class="fa fa-volume-up fa-xs"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"></div>
+							<div class="optionGroup" title="Metronome volume"><span class="config"><i class="fa fa-drum" id="bpm_icon" style="margin-right: 5px;"></i><i class="fa fa-volume-up fa-xs"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"></div>
 						</div>
 						<div style="flex-grow: 1;">
-							<div class="optionGroup"><span class="config"><i title="BPM" class="fa fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"></div>
-							<div class="optionGroup"><span class="config"><i title="Humanize" class="fa fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">10</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)"></div>
+							<div class="optionGroup" title="BPM"><span class="config"><i class="fa fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"></div>
+							<div class="optionGroup" title="Humanize"><span class="config"><i class="fa fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">10</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)"></div>
 						</div>
 						<div style="display: flex; flex-grow: 1; justify-content: center; color: white;">
 							<div class="optionGroup"><label>Select chord sound <br /><select id="selectSound" onchange="selectSound()">
