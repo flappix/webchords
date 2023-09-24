@@ -81,10 +81,10 @@
 		{
 			font-size: 3em;
 			margin: 0px;
-			background: rgba(255, 255, 255, 0.5);
+			background: rgba(0, 0, 0, 0.2);
 			padding: 20px;
-			backdrop-filter: blur(20px);
-			-webkit-backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(5px);
+			backdrop-filter: blur(5px);
 		}
 		
 		.example, .loaditem
@@ -698,9 +698,6 @@
 					}
 				}
 				
-				let url = window.location.href.split('?')[0];
-				$('#share_link').val ( url + '?progression=' + encodeURIComponent ( $('#chords').val() ) );
-				
 				if ( $('#chords').get(0).selectionStart >= $('#chords').val().length )
 				{
 					$([document.documentElement, document.body]).animate({
@@ -943,6 +940,9 @@
 			if (!play)
 			{
 				start();
+				$('#parsed').show();
+				$('#inputSection').show();
+				
 				$('.menuItem').hide();
 			}
 			else
@@ -1024,13 +1024,21 @@
 			$('#' + id).toggle();
 			window.scrollTo (0, 0);
 			
+			if (id == 'share')
+			{
+				let url = window.location.href.split('?')[0];
+				$('#share_link').val ( url + '?progression=' + encodeURIComponent ( $('#chords').val() ) + '&beats=' + encodeURIComponent ( $('#beats_per_bar').val() ) );
+			}
+			
 			if (! ['play', 'save'].includes (id) )
 			{
 				$('#parsed').hide();
+				$('#inputSection').hide();
 			}
 			else
 			{
 				$('#parsed').show();
+				$('#inputSection').show();
 			}
 		}
 		
@@ -1049,6 +1057,7 @@
 			$('#beats_per_bar').val (beats);
 			
 			$('#parsed').show();
+			$('#inputSection').show();
 			setTimeout ( function() { window.scrollTo (0, 0); }, 1000 );
 			
 		}
@@ -1127,7 +1136,7 @@
 		
 		$(document).ready ( () => {
 			
-			$('#content').resizable({
+			$('#inputSection').resizable({
 				handles: "s",
 				maxHeight: $('#content').height()
 				});
@@ -1138,6 +1147,10 @@
 			if (params.progression)
 			{
 				$('#chords').val (params.progression);
+			}
+			if (params.beats)
+			{
+				$('#beats_per_bar').val (params.beats);
 			}
 			
 			sequence = parseInput();
@@ -1225,46 +1238,48 @@
 				
 			</div>
 			
-			<span id="transposeDownDisplay" class="transposeDisplay"></span>  <button class="transpose" title="transpose down half step" onclick="transpose (-1)">&#x2B07;</button>  <input type="text" id="chords" value="A7 D9 | G7 Cmaj7 | Fmaj7 Bm7b5 | Esus4 % Eadd9 E/G#" /> <button title="transpose up half step" class="transpose" onclick="transpose (1)">&#x2B06;</button> <span class="transposeDisplay" id="transposeUpDisplay"></span> <br />
-			
-			
-			<br />
-			<div style="display: flex;">
-				<i class="fa fa-eye-slash" onclick="$('#options').toggle()" style="color: white; margin: 5px;" title="hide/show options"></i>
-				<div style="display: flex; width: 100%;" id="options">
-					<div style="flex-grow: 1;">
-						<div class="optionGroup"><span class="config"><i title="volume" class="fa fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"></div>
-						<div class="optionGroup"><span class="config"><i title="Metronome volume" class="fa fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"></div>
-					</div>
-					<div style="flex-grow: 1;">
-						<div class="optionGroup"><span class="config"><i title="BPM" class="fa fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"></div>
-						<div class="optionGroup"><span class="config"><i title="Humanize" class="fa fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">10</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)"></div>
-					</div>
-					<div style="display: flex; flex-grow: 1; justify-content: center; color: white;">
-						<div class="optionGroup"><label>Select chord sound <br /><select id="selectSound" onchange="selectSound()">
-							<option value="acoustic_grand_piano">Piano</option>
-							<option value="acoustic_guitar_nylon">Classical guitar</option>
-							<option value="acoustic_guitar_steel">Western guitar</option>
-							<option value="electric_guitar_clean">Electric guitar clean</option>
-							<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
-						</select></label></div>
-						<div class="optionGroup">
-							
-							<label>beats per bar <br />
-								<input type="number" value="4" min="1" step="1" id="beats_per_bar" style="width: 2em;" />
-							</label>
-							
-							<label>Select metronome sound <br />
-								<select id="selectDrum" onchange="selectDrum()">
-									<option value="42">HiHat</option>
-									<option value="39">Clap</option>
-									<option value="40">Snare</option>
-								</select>
-							</label>
+			<div id="inputSection">
+				<span id="transposeDownDisplay" class="transposeDisplay"></span>  <button class="transpose" title="transpose down half step" onclick="transpose (-1)">&#x2B07;</button>  <input type="text" id="chords" value="A7 D9 | G7 Cmaj7 | Fmaj7 Bm7b5 | Esus4 % Eadd9 E/G#" /> <button title="transpose up half step" class="transpose" onclick="transpose (1)">&#x2B06;</button> <span class="transposeDisplay" id="transposeUpDisplay"></span> <br />
+				
+				
+				<br />
+				<div style="display: flex;">
+					<i class="fa fa-eye-slash" onclick="$('#options').toggle()" style="color: white; margin: 5px;" title="hide/show options"></i>
+					<div style="display: flex; width: 100%;" id="options">
+						<div style="flex-grow: 1;">
+							<div class="optionGroup"><span class="config"><i title="volume" class="fa fa-volume-up"></i> </span> <span class="range_value" id="vol_value">110</span> <input type="range" min="0" max="127" value="110" id="vol" onchange="changeVolume ('chord', $(this).val() );" oninput="$('#vol_value').html (this.value)"></div>
+							<div class="optionGroup"><span class="config"><i title="Metronome volume" class="fa fa-drum" id="bpm_icon"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"></div>
 						</div>
-						
-						<div class="optionGroup">
-							<label><input type="checkbox" id="voice_leading" style="transform: scale(1.5); margin: 5px; accent-color: #34495e;" checked /><br /> Voice leading</label>
+						<div style="flex-grow: 1;">
+							<div class="optionGroup"><span class="config"><i title="BPM" class="fa fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"></div>
+							<div class="optionGroup"><span class="config"><i title="Humanize" class="fa fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">10</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)"></div>
+						</div>
+						<div style="display: flex; flex-grow: 1; justify-content: center; color: white;">
+							<div class="optionGroup"><label>Select chord sound <br /><select id="selectSound" onchange="selectSound()">
+								<option value="acoustic_grand_piano">Piano</option>
+								<option value="acoustic_guitar_nylon">Classical guitar</option>
+								<option value="acoustic_guitar_steel">Western guitar</option>
+								<option value="electric_guitar_clean">Electric guitar clean</option>
+								<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
+							</select></label></div>
+							<div class="optionGroup">
+								
+								<label>beats per bar <br />
+									<input type="number" value="4" min="1" step="1" id="beats_per_bar" style="width: 2em;" />
+								</label>
+								
+								<label>Select metronome sound <br />
+									<select id="selectDrum" onchange="selectDrum()">
+										<option value="42">HiHat</option>
+										<option value="39">Clap</option>
+										<option value="40">Snare</option>
+									</select>
+								</label>
+							</div>
+							
+							<div class="optionGroup">
+								<label><input type="checkbox" id="voice_leading" style="transform: scale(1.5); margin: 5px; accent-color: #34495e;" checked /><br /> Voice leading</label>
+							</div>
 						</div>
 					</div>
 				</div>
