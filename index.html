@@ -62,7 +62,9 @@
 		
 		label
 		{
+			display: block;
 			font-family: Sans-Serif;
+			font-weight: bold;
 		}
 		
 		#content, #loading
@@ -486,9 +488,12 @@
 					{
 						MIDI.setVolume (channel['drum'], volume['drum']);
 						MIDI.noteOn (channel['drum'], drum_sound, 127, 0);
-						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) );
-						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) * 2);
-						MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / 4) * 3);
+						
+						let beats = $('#time_signature').val();
+						for (let b=1; b<beats; b++)
+						{
+							MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / beats) * b );
+						}
 					}
 					
 					$(`#chord_${bar_c}_${chord_c}`).addClass ('play');
@@ -1209,11 +1214,20 @@
 							<option value="electric_guitar_clean">Electric guitar clean</option>
 							<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
 						</select></label></div>
-						<div class="optionGroup"><label>Select metronome sound <br /><select id="selectDrum" onchange="selectDrum()">
-							<option value="42">HiHat</option>
-							<option value="39">Clap</option>
-							<option value="40">Snare</option>
-						</select></label></div>
+						<div class="optionGroup">
+							
+							<label>time signature <br />
+								<input type="number" value="4" min="1" step="1" id="time_signature" style="width: 2em;" /> / 4
+							</label>
+							
+							<label>Select metronome sound <br />
+								<select id="selectDrum" onchange="selectDrum()">
+									<option value="42">HiHat</option>
+									<option value="39">Clap</option>
+									<option value="40">Snare</option>
+								</select>
+							</label>
+						</div>
 						
 						<div class="optionGroup">
 							<label><input type="checkbox" id="voice_leading" style="transform: scale(1.5); margin: 5px; accent-color: #34495e;" checked /><br /> Voice leading</label>

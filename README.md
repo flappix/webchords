@@ -15,6 +15,7 @@ Feel free to report bugs or feature requests in the issue section.
 - Recognition of complex chords like **Fbm<sup>add4</sup>/G** or **G#<sup>maj9b5</sup>**
 - Configuration of chord volume, metronome volume, tempo
 - different chord and metronome sounds
+- custom time signature
 - Humanized playback
 - Save/load progression locally and share them via link
 - Key transposition
