@@ -568,6 +568,19 @@
 			//if (loaded)
 			//{
 				let query = $('#chords').val().replace(/\s\s+/g, ' ').replace (/\s?[\|,;]\s?/g, '|').replace (/\([\|,;]\)/g, '').trim();
+				//console.log (query);
+				let repeat = true;
+				while (repeat) {
+					repeat = false;
+					query = query.replace (/:(.*?):([0-9])?/g, function (a,b,c) {
+						console.log (1);
+						let n = Number (c ?? 1);
+						let arr = Array (n + 1).fill (b);
+						repeat = true;
+						return arr.join (',');
+					});
+				}
+				//console.log (query);
 				let query_bars = query.split (/[|,;]+/);
 				
 				let sequence = [];
@@ -811,11 +824,11 @@
 			let s = '';
 			for (let d of docs)
 			{
-				console.log (d?.progression);
+				//console.log (d?.progression);
 				//console.log (d?.progression.trim());
 				if (d && d.progression && d.progression.trim() != '')
 				{
-					console.log (parseInt (d.beats));
+					//console.log (parseInt (d.beats));
 					s += `<div class="loaditem"><span onclick="loadProgression ('${d.progression}', ${parseInt (d.beats)})">${d.progression}</span> <i class="fa fa-trash" onclick="remove ('${d.progression}')"></i></div>`;
 				}
 			}
