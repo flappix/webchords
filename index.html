@@ -573,7 +573,6 @@
 				while (repeat) {
 					repeat = false;
 					query = query.replace (/:(.*?):([0-9])?/g, function (a,b,c) {
-						console.log (1);
 						let n = Number (c ?? 1);
 						let arr = Array (n + 1).fill (b);
 						repeat = true;
@@ -1321,9 +1320,9 @@
 	</div>
 	
 	<div id="examples"  class="menuItem" style="display: none;">
-		<div class="example" onclick="loadProgression ($(this).html());">Dm/F | Bbmaj7 | C | A7</div>
 		<div class="example" onclick="loadProgression ($(this).html());">Cmadd9 % Ab6 Ebmaj7 | Ebaug Ddim7 _ G7/Ab | _ Ab7 % G7</div>
 		<div class="example" onclick="loadProgression ($(this).html());">Em Esus2 Em Esus4, Cadd#4 Amadd9, F7 E7, B7/C % F#dim D#dim</div>
+		<div class="example" onclick="loadProgression ($(this).html());">Dm/F | Bbmaj7 | C | A7, :Bb A:</div>
 	</div>
 	
 	<div id="help" class="menuItem" style="display: none; font-family: Sans-serif;">
@@ -1332,7 +1331,9 @@
 		Separate bars with a | , or ;<br />
 		Use % to repeat the last chord<br />
 		Use _ to play pause<br />
-		Each chord is played equally long in each bar. E.g. putting 4 chords in one bar result in one chord every beat.
+		Each chord is played equally long in each bar. E.g. putting 4 chords in one bar result in one chord every beat.<br />
+		Embed a part of your progression in : to repeat it, e.g. :Am Dm:<br />
+		Use a number to repeat more then once, e.g. :Am Dm:4
 	</div>
 	
 	<div id="share" class="menuItem" style="display: none; font-family: Sans-serif; text-align: center;">
