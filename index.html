@@ -414,7 +414,7 @@
 		let last_chord;
 		
 		let humanize = 10;
-		let max_note_length = 3;
+		let staccato_legato = 0.25;
 		
 		let start_at_bar = 0;
 		let start_at_chord = 0;
@@ -450,18 +450,18 @@
 							}
 						}
 						
-						if (last_chord)
+						/*if (last_chord)
 						{
 							//MIDI.chordOff (channel['chord'], last_chord, 0);
 							for (let [n, d] of Object.entries (last_chord) )
 							{
-								if ( !inversion.includes (n)/* || Date.now() - d > max_note_length */)
+								if ( !inversion.includes (n))
 								{
 									MIDI.noteOff (channel['chord'], n, 0);
 								}
 								
 							}
-						}
+						}*/
 						
 						MIDI.setVolume (channel['chord'], volume['chord']);
 						
@@ -478,6 +478,11 @@
 								let off =  Math.random() * (humanize / 100);
 								MIDI.noteOn (channel['chord'], n, vel, off);
 								played.push ({n: Date.now()});
+								
+								let timeout = seq[bar_c][chord_c].duration * 1000;
+								setTimeout (()=> {
+									MIDI.noteOff (channel['chord'], n, 0);
+								}, timeout - (timeout * staccato_legato)  );
 							}
 							
 							  $([document.documentElement, document.body]).animate({
@@ -1227,11 +1232,16 @@
 				</div>
 				
 				<div style="flex-grow: 1; display: flex; align-items: center; justify-content: space-evenly; background-color: #343434;">
-					<a href="https://github.com/flappix/chordlooper">
+					<a href="https://github.com/flappix/chordlooper" title="this project on github">
 						<img src="GitHub-Mark-Light-64px.png" width="40px;" />
 					</a>
 					
-					<a href="https://soundcloud.com/user-21721742/tracks">
+					
+					<a href="https://flappix.github.io/web_intonation/" title="Online tool for exploring musical tuning systems" style="color: white; font-size: 1.5em; font-family: Arial; text-decoration: none;">
+						Web<br />Intonation
+					</a>
+							
+					<a href="https://soundcloud.com/user-21721742/tracks" title="my music on soundcloud">
 						<img src="soundcloud.png" width="40px;" />
 					</a>
 				</div>
@@ -1251,17 +1261,27 @@
 							<div class="optionGroup" title="Metronome volume"><span class="config"><i class="fa fa-drum" id="bpm_icon" style="margin-right: 5px;"></i><i class="fa fa-volume-up fa-xs"></i> </span> <span class="range_value" id="drum_volume_value">10</span> <input type="range" min="0" max="127" value="10" id="drum_volume" onchange="changeVolume ('drum', $(this).val() );" oninput="$('#drum_volume_value').html (this.value)"></div>
 						</div>
 						<div style="flex-grow: 1;">
-							<div class="optionGroup" title="BPM"><span class="config"><i class="fa fa-heartbeat" id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"></div>
+							<div class="optionGroup" title="BPM"><span class="config"><i class="fa fa-heartbeat" style="cursor: pointer;"  id="bpm_icon" onclick="toggleMetronome()"></i> </span> <span class="range_value" id="bpm_value">80</span> <input type="range" min="20" max="300" value="80" id="bpm" onchange="changeBPM();" oninput="$('#bpm_value').html (this.value)"></div>
 							<div class="optionGroup" title="Humanize"><span class="config"><i class="fa fa-user" id="humanize_icon"></i> </span> <span class="range_value" id="humanize_value">10</span> <input type="range" min="0" max="127" value="10" id="humanize" onchange="changeHumanize();" oninput="$('#humanize_value').html (this.value)"></div>
 						</div>
 						<div style="display: flex; flex-grow: 1; justify-content: center; color: white;">
-							<div class="optionGroup"><label>Select chord sound <br /><select id="selectSound" onchange="selectSound()">
-								<option value="acoustic_grand_piano">Piano</option>
-								<option value="acoustic_guitar_nylon">Classical guitar</option>
-								<option value="acoustic_guitar_steel">Western guitar</option>
-								<option value="electric_guitar_clean">Electric guitar clean</option>
-								<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
-							</select></label></div>
+							<div class="optionGroup">
+								<label>Select chord sound <br />
+									<select id="selectSound" onchange="selectSound()">
+										<option value="acoustic_grand_piano">Piano</option>
+										<option value="acoustic_guitar_nylon">Classical guitar</option>
+										<option value="acoustic_guitar_steel">Western guitar</option>
+										<option value="electric_guitar_clean">Electric guitar clean</option>
+										<option value="pad_2_warm" data-humanize="0" data-volume="40">Pad</option>
+									</select>
+								</label>
+								
+								<div title="BPM" style="display: flex; align-items: center;">
+									<span>legato</span>
+									<input type="range" min="0" max="0.99" value="0.25" step="0.01" id="staccato_legato_value" onchange="staccato_legato =  this.value;" style="margin: 0.5em 0.5em 0.5em 0.5em;" />
+									<span>staccato</span>
+								</div>
+							</div>
 							<div class="optionGroup">
 								
 								<label>beats per bar <br />
