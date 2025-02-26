@@ -421,19 +421,29 @@
 		 
 		function bar_length()
 		{
-			return ( 60 / Number ( $('#bpm').val() ) ) * 4 ;
+			return ( 60 / Number ( $('#bpm').val() ) ) * Number ( $('#beats_per_bar').val() ) ;
 		}
 		
 		function linearTrans (x1, x2, a, b, c)
 		{
 			return x1 + ((x2 - x1)/(b - a)) * (c - a);
 		}
-
 		
 		function loopSequence (seq)
 		{	
 			let min_note = Infinity;
 			let max_note = -Infinity;
+			
+			function playBeat() {
+				MIDI.setVolume (channel['drum'], volume['drum']);
+				MIDI.noteOn (channel['drum'], drum_sound, 127, 0);
+				
+				let beats = Number ( $('#beats_per_bar').val() );
+				for (let b=1; b<beats; b++)
+				{
+					MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / beats) * b );
+				}
+			}
 			
 			function playChord (bar_c, chord_c, beat=false)
 			{				
@@ -497,14 +507,15 @@
 					
 					if (beat && play_metronome) 
 					{
-						MIDI.setVolume (channel['drum'], volume['drum']);
+						/*MIDI.setVolume (channel['drum'], volume['drum']);
 						MIDI.noteOn (channel['drum'], drum_sound, 127, 0);
 						
-						let beats = $('#beats_per_bar').val();
+						let beats = Number ( $('#beats_per_bar').val() );
 						for (let b=1; b<beats; b++)
 						{
 							MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / beats) * b );
-						}
+						}*/
+						playBeat();
 					}
 					
 					$(`#chord_${bar_c}_${chord_c}`).addClass ('play');
@@ -537,26 +548,29 @@
 			
 			let start_bar = start_at_bar;
 			let start_chord = start_at_chord;
-			playChord (start_at_bar, start_at_chord, seq[start_at_bar][start_at_chord].duration);
-		}
-		
-		/*function metronome()
-		{
-			function playBeat()
-			{				
-				if (play_metronome == true)
+			
+			
+			let count_in = $('#count_in').is (':checked');
+			let pre_delay = count_in ? bar_length() * 1000 : 0;
+			
+			
+			if (count_in)
+			{
+				/*MIDI.setVolume (channel['drum'], volume['drum']);
+				MIDI.noteOn (channel['drum'], drum_sound, 127, 0);
+				
+				let beats = Number ( $('#beats_per_bar').val() );
+				for (let b=1; b<beats; b++)
 				{
-					MIDI.noteOn (channel['drum'], 50, 127, 0)
-					setTimeout (playBeat, (bar_length() / 4) * 1000 );
-				}
-				else if (play_metronome == 'stop') //confirm stopping
-				{
-					play_metronome = false;
-				}
+					MIDI.noteOn (channel['drum'], drum_sound, 127, (bar_length() / beats) * b );
+				}*/
+				playBeat();
 			}
 			
-			playBeat();
-		}*/
+			setTimeout ( () => {
+				playChord (start_at_bar, start_at_chord, seq[start_at_bar][start_at_chord].duration);
+			}, pre_delay);
+		}
 		
 		function formatChord (chord)
 		{
@@ -568,7 +582,6 @@
 			//if (loaded)
 			//{
 				let query = $('#chords').val().replace(/\s\s+/g, ' ').replace (/\s?[\|,;]\s?/g, '|').replace (/\([\|,;]\)/g, '').trim();
-				//console.log (query);
 				let repeat = true;
 				while (repeat) {
 					repeat = false;
@@ -579,7 +592,7 @@
 						return arr.join (',');
 					});
 				}
-				//console.log (query);
+
 				let query_bars = query.split (/[|,;]+/);
 				
 				let sequence = [];
@@ -823,11 +836,8 @@
 			let s = '';
 			for (let d of docs)
 			{
-				//console.log (d?.progression);
-				//console.log (d?.progression.trim());
 				if (d && d.progression && d.progression.trim() != '')
 				{
-					//console.log (parseInt (d.beats));
 					s += `<div class="loaditem"><span onclick="loadProgression ('${d.progression}', ${parseInt (d.beats)})">${d.progression}</span> <i class="fa fa-trash" onclick="remove ('${d.progression}')"></i></div>`;
 				}
 			}
@@ -1265,7 +1275,7 @@
 				
 				
 				<br />
-				<div style="display: flex;">
+				<div style="display: flex; overflow-x: scroll;">
 					<i class="fa fa-eye-slash" onclick="$('#options').toggle()" style="color: white; margin: 5px;" title="hide/show options"></i>
 					<div style="display: flex; width: 100%;" id="options">
 						<div style="flex-grow: 1;">
@@ -1297,7 +1307,7 @@
 							<div class="optionGroup">
 								
 								<label>beats per bar <br />
-									<input type="number" value="4" min="1" step="1" id="beats_per_bar" style="width: 2em;" />
+									<input type="number" value="4" min="1" step="1" id="beats_per_bar" style="width: 2em;" onclick="sequence = parseInput();" />
 								</label>
 								
 								<label>Select metronome sound <br />
@@ -1306,6 +1316,10 @@
 										<option value="39">Clap</option>
 										<option value="40">Snare</option>
 									</select>
+								</label>
+								
+								<label>
+									<input type="checkbox" id="count_in" /> Count in
 								</label>
 							</div>
 							
