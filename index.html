@@ -1180,6 +1180,12 @@
 				$('#beats_per_bar').val (params.beats);
 			}
 			
+			if (params.bpm)
+			{
+				$('#bpm').val (params.bpm);
+				$('#bpm_value').html (params.bpm)
+			}
+			
 			sequence = parseInput();
 			render();
 					
